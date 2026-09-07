@@ -1,0 +1,13 @@
+{% extends "entity/change_word_base.html" %}
+{% block entity-title %}Синонимы{% endblock %}
+{% block add-title %}Добавить синонимы{% endblock %}
+{% block select-name %}synonyms{% endblock %}
+{% block options %}
+	{% for s in word.synonyms.all %}
+		{% ifequal word.user s.user %}
+			<option value="{{s.id}}" selected="1">{{s}}</option>
+		{% endifequal %} 
+	{% endfor %}
+{% endblock %}
+{% block save-link %}EWT.ajax.post('{{ word.ajax_change_synonyms }}'){% endblock %}
+{% block lookup-link %}{% url ajax_change_get_entities 'words' %}{% endblock %}

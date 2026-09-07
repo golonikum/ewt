@@ -1,0 +1,44 @@
+{% load custom_filters %}
+<div class="test-correct-num">пройдено: {{words.success}}, всего: {{words.all}}</div>
+<div class="entity">
+	{% if w.0.sentences.all %}
+		{% for s in w.0.sentences.all %}
+			<h1 class="sentence">
+				{{ s.body|highlight_words:w|safe }}
+			</h1>
+		{% endfor %}
+	{% endif %}
+
+	<h1>
+		{{ w.0 }}
+		{% if w.0.transcription %}
+			<span class="transcription">[{{ w.0.transcription }}]</span>
+		{% endif %}
+	</h1>
+	<p>{{ w.0.translation }}</p>
+
+	<p>
+	{% if w.0.synonyms.all %}
+		Синонимы:
+		{% for word in w.0.synonyms.all %}
+			{% include "word_snippet_exercise.html" %}
+		{% endfor %}
+	{% endif %}
+	</p>
+
+	<p>
+	{% if w.0.groups.all %}
+		Тэги:
+		{% for g in w.0.groups.all %}
+			<a class="ajax{% if forloop.counter|check_even %} odd{% endif %}" onclick="EWT.ajax.get('{{g.ajax_get}}')">{{g}}</a>
+		{% endfor %}
+	{% endif %}
+	</p>
+
+	<form>
+		<div class="fieldWrapper">
+			<button onclick="EWT.ajax.get('{{exercise.ajax_exercise}}?id={{w.0.id}}')" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only onenter-go"><span class="ui-button-text">следующее</span></button>
+		</div>
+		<div class="clear"></div>
+	</form>
+</div>

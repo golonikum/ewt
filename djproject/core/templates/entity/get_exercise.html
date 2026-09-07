@@ -1,0 +1,46 @@
+{% load custom_filters %}
+{% include "menu/entity.html" %}
+<div class="entity">
+	<h1>{{ exercise.title }}</h1>
+	<p class="speech_part">Создано {{ exercise.created|date:"d.m.Y в H:i" }}.</p>	
+	{% if exercise.finished %}<p class="speech_part">Закончено {{ exercise.finished|date:"d.m.Y в H:i" }}.</p>{% endif %}	
+	{% if exercise.to_date or exercise.from_date %}
+		<h2 class="partition">Фильтр по дате</h2>
+		<p>
+			с 
+			{% if exercise.from_date %}{{ exercise.from_date|date:"d.m.Y" }}{% else %}..{% endif %} 
+			по 
+			{% if exercise.to_date %}{{ exercise.to_date|date:"d.m.Y" }}{% else %}..{% endif %}
+		</p>
+	{% endif %}
+	<h2 class="partition">{{exercise.exercise_type}}</h2>
+	<p>{{exercise.exercise_type.description}}</p>
+	{% if exercise.group %}
+		<h2 class="partition">Фильтр по тэгу</h2>
+		<p>{{ exercise.group }}</p>
+	{% endif %}
+	{% if exercise.speech_part %}
+		<h2 class="partition">Фильтр по части речи</h2>
+		<p>{{ exercise.speech_part }}</p>
+	{% endif %}
+	{% if exercise.record_set.all %}
+		<h2 class="partition">Результаты</h2>
+		<p>Пройдено слов - {{exercise.record_set.all|length}}, из них правильно - {{exercise.record_set|get_success}}, неправильно - {{exercise.record_set|get_failed}}.</p>
+		{% ifnotequal exercise.record_set.all|length 0 %}
+			<div id="exercise-records">
+				<a class="ajax" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}', 'exercise-records')">посмотреть</a>
+			</div>
+		{% endifnotequal %}
+	{% endif %}
+	{% if not exercise.finished %}
+		<div class="ajax-menu">
+			{% if exercise.record_set.all %}
+				<a class="ajax" onclick="EWT.ajax.get('{{exercise.ajax_exercise}}')">продолжить</a>
+			{% else %}
+				<a class="ajax" onclick="EWT.ajax.get('{{exercise.ajax_exercise}}')">начать</a> |
+				<a class="ajax" onclick="EWT.ajax.get('{{exercise.ajax_update}}')">редактировать</a> |
+				<a class="ajax" onclick="EWT.ajax.remove('{{exercise.ajax_remove}}')">удалить</a>
+			{% endif %}
+		</div>
+	{% endif %}
+</div>

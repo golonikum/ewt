@@ -1,0 +1,11 @@
+{% include "menu/entity.html" %}
+<form method="post" action="" onsubmit="return false;">
+    {% csrf_token %}
+    {% include "form_snippet.html" %}
+    <div class="fieldWrapper">
+    	<label>&nbsp;</label>
+		<span class="form-colon">&nbsp;</span>
+		<button onclick="EWT.ajax.post('{{ btn_link }}')" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">{{ btn_value }}</span></button>		
+	</div>
+	<div class="clear"></div>
+</form>

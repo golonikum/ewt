@@ -1,0 +1,15 @@
+.git
+.gitignore
+.gitattributes
+.editorconfig
+.cursor
+backup
+*.md
+*.bat
+*.sh
+__pycache__
+*.pyc
+*.pyo
+db.sqlite3
+.env
+.env.*

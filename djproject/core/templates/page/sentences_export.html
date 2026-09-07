@@ -1,0 +1,39 @@
+{% load custom_filters %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<style>
+body {font-family:Consolas,monospace;font-size:14px}
+span.hl {font-weight:bold}
+div {margin-top: 5px}
+</style>
+</head>
+<body>
+	<h2>Context</h2>
+	{% for sentence in sentences %}
+	   <div>
+	   {{forloop.counter}})
+		{% if sentence.word_set.all %}
+			{{ sentence.body|highlight_words_with_title:sentence.word_set.all|safe }}
+		{% else %}
+			{{ sentence.body }}
+		{% endif %}
+	   </div>
+	{% endfor %}
+	<h2>Vocabulary</h2>
+	{% for word in words %}
+	   <div>
+	    <b>{{ word.signature }}</b>
+		<i>{{ word.speech_part.short_name }}</i>
+		{% if word.transcription %}
+			[{{ word.transcription }}]
+		{% endif %}
+		{{ word.translation }}
+		{% for w in word.synonyms.all %}
+			| <i>{{ w.signature }}</i>
+		{% endfor %}
+	   </div>
+	{% endfor %}	
+</body>
+</html>

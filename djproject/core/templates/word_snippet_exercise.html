@@ -1,0 +1,2 @@
+{% load custom_filters %}
+<a title="{{word.translation}}" class="ajax{% if forloop.counter|check_even %} odd{% endif %}" onclick="EWT.ajax.get('{{word.ajax_get}}')">{{word}}</a> 

@@ -1,0 +1,274 @@
+/* ====================================================================
+ * CSS for project EWT: main decoration styles for elements
+ * developed: N.Golov
+ * created: 07.05.2010
+ * ====================================================================
+ */
+
+/* common rules
+---------------------------------------------------------------------*/
+* {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+a:hover {	
+	cursor: pointer;
+}
+span.hl {
+	color: #ff8000;
+}
+/* ajax links
+---------------------------------------------------------------------*/
+a.ajax,
+a#upload_button {
+	color: #333;
+	padding: 1px 3px;
+}
+a.ajax:hover,
+a.ajax.hover,
+a#upload_button.hover {
+	color: #fff;
+	background: #467b55;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	text-shadow: 0 1px 0 #000;
+}
+div.ajax-menu {
+	font-size: 0.9em;
+	font-weight: bold;
+	margin: 20px 0 20px 0;
+}
+a.odd,
+span.odd {
+	background: #D5E0C4;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+/* common design elements
+---------------------------------------------------------------------*/
+.transcription,
+#id_transcription {
+	font-family: "Courier New", monospace;
+}
+
+body {
+	background: url(../imgs/b003.jpg) fixed;
+	margin-top: 18px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 960px;
+}
+.ajax-error {
+	color: #dd3c40;
+}
+/* partition LOGO
+----------------------------------*/
+#logo {
+	background: url(../imgs/Vintage3-08.jpg);
+	margin-bottom: 18px;
+	/*height: 55px;*/
+	z-index: 100;
+	text-align: center;
+	font-size: 1.3em;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	box-shadow: 0px 0px 10px #000;
+	-moz-box-shadow: 0px 0px 10px #000;
+	border: 1px solid #ddb;
+}
+#logo h1 {
+	margin: 30px;
+}
+/* partition HEADER (with navigation)
+---------------------------------------------------------------------*/
+#menu {
+	border: 1px solid #555;
+	/*background: url(pepper-grinder/images/ui-bg_fine-grain_15_ffffff_60x60.png);*/
+	background: #eceadf url(pepper-grinder/images/ui-bg_fine-grain_10_eceadf_60x60.png) 50% 50% repeat;
+	z-index: 90;
+	box-shadow: 0px 0px 10px #000;
+	-moz-box-shadow: 0px 0px 10px #000;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	clear: both;
+	margin-bottom: 18px;
+	padding: 0.4em 0.6em;
+    position: relative;
+}
+#menu li {
+	list-style: none;
+	float: left;
+	margin: 0.4em 0.4em 0.2em 0.4em;
+}
+#menu li#logout {
+    position: absolute;
+    right: 15px;
+}
+#menu li#username {
+	position: absolute;
+	right: 95px;
+}
+#menu li.clear {
+	float: none;
+}
+#menu a,
+#menu span {
+	font-size: 1.5em;
+	font-weight: bold;
+}
+/* partition CONTENT
+---------------------------------------------------------------------*/
+#content { 
+	box-shadow: 0px 0px 10px #000;
+    border: 1px solid #555;
+	-moz-box-shadow: 0px 0px 10px #000;
+	z-index: 80; 
+}
+#content .ui-tabs-panel {
+	/*overflow-y: scroll;*/
+	position: relative;
+	height: 600px;
+	margin-bottom: 17px;
+}
+#content h1.sentence { 
+	margin-bottom: 20px;
+}
+#content li .ui-icon-close { 
+	float: left; 
+	margin: 0.7em 0.8em 0 0;
+    background-position: -32px -192px;
+	cursor: pointer; 
+}
+#content p,
+#content pre,
+#content a.entity {
+	/* :TODO: for all */
+	font-size: 1.4em;
+	line-height: 1.4em;
+}
+#content pre {
+	font-family: "Trebuchet MS", Tahoma, Verdana, Arial, sans-serif;		
+	white-space: pre-wrap;
+}
+#content h2.partition {
+	border-bottom: 1px solid #ccc;
+	background-color: #c9decb;	
+	margin-top: 1.2em;
+	margin-bottom: 0.3em; 
+	color: #3c5a36;
+}
+#content div.ui-tabs-panel div {
+	/*margin-bottom: 2.1em;*/
+}
+#content #keyboard {
+	clear: both;
+	margin-left: 220px;
+	padding: 5px 0;
+	display: none;
+}
+#content table th div {
+	margin: 10px;
+}
+#content table td {
+	font-size: 1.4em;
+}
+#content table tr.even {
+	background: #d5e0c4;
+}
+#pagination {
+	text-align: center;
+}
+.test-correct-num {
+	text-align: right; 
+	color: #888;	
+}
+img.edit-img {
+	opacity: 0.6;
+	margin-bottom: -5px;
+}
+img.edit-img:hover {
+	cursor: pointer;
+	opacity: 1.0;
+}
+/* partition FOOTER
+---------------------------------------------------------------------*/
+#footer {
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	border: 1px solid #ddb;
+	background: url(pepper-grinder/images/ui-bg_fine-grain_10_eceadf_60x60.png);
+	z-index: 70;
+	margin-top: 18px;
+	box-shadow: 0px 0px 10px #000;
+	-moz-box-shadow: 0px 0px 10px #000;
+}
+#footer #subscribe,
+#footer #links {
+	margin: 18px;
+	text-align: right;
+}
+#footer #subscribe {
+	font-family: "Trebuchet MS", Tahoma, Verdana, Arial, sans-serif;
+	font-size: 0.7em;
+	color: #444;
+}
+#footer #subscribe a {
+	text-decoration: none;
+	color: inherit;
+}
+#footer #subscribe a:hover {
+	text-decoration: underline;
+}
+a.outer img {
+	border: 1px solid #fff;
+	padding: 3px; 
+	opacity: 0.6;
+}
+a.outer img:hover {
+	border: 1px solid #788; 
+	box-shadow: 0px 0px 4px #2c4;
+	-moz-box-shadow: 0px 0px 4px #2c4;
+	opacity: 1.0;
+}
+/* tooltip
+---------------------------------------------------------------------*/
+#tooltip {
+	position: absolute;
+	z-index: 3000;
+	padding: 10px;
+	opacity: 1;
+	color: #666;
+	box-shadow: 0px 0px 10px #000;
+	-moz-box-shadow: 0px 0px 10px #000;
+	border-radius: 6px;
+	-moz-border-radius: 6px;
+	border: 1px solid #ddb;
+	background: url(pepper-grinder/images/ui-bg_fine-grain_10_eceadf_60x60.png);
+}
+#tooltip h3 {
+	padding-left: 5px;
+	font-weight: normal;
+	font-size: 0.7em;
+	font-family: "Trebuchet MS", Tahoma, Verdana, Arial, sans-serif;
+	margin: 0;
+}
+/* other styles
+---------------------------------------------------------------------*/
+#player {
+	visibility: hidden;
+}
+.clear {
+	clear: both;
+	display: block;
+	overflow: hidden;
+	visibility: hidden;
+	width: 0;
+	height: 0;
+}
+p.odd {
+	background-color: #D5E0C4;
+}
+span.simple {
+	padding: 1px 3px;
+}

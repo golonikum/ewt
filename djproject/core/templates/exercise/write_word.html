@@ -1,0 +1,43 @@
+{% load custom_filters %}
+{% include "exercise/show_total.html" %}
+<div class="entity">
+	<h1>{{ word.speech_part }}</h1>
+	<p>{{ word.translation }}</p>
+	<p>
+	{% if word.synonyms.all %}
+		Синонимы:
+		{% for w in word.synonyms.all %}
+			<span class="simple{% if forloop.counter|check_even %} odd{% endif %}">{{w}}</span>
+		{% endfor %}
+	{% endif %}
+	</p>
+	<p>
+	{% if word.groups.all %}
+		Тэги:
+		{% for g in word.groups.all %}
+			<span class="simple{% if forloop.counter|check_even %} odd{% endif %}">{{g}}</span>
+		{% endfor %}
+	{% endif %}
+	</p>
+	{% if word.sentences.all %}
+		<br/>
+		<p>
+		{% for s in word.sentences.all %}
+			<h1 class="sentence">
+				{{ s.body|hide_word:word|safe }}
+			</h1>
+		{% endfor %}
+		</p>
+	{% endif %}
+	<form>
+		<div class="fieldWrapper">
+			<input type="text" name="test-sign" size="{{ word.signature|length }}" maxlength="{{ word.signature|length }}" style="width:inherit"/>
+			<input type="hidden" name="real" value="{{word.signature}}"/>
+			<input type="hidden" name="id" value="{{word.id}}"/>
+		</div>
+		<div class="fieldWrapper">
+			<button onclick="EWT.ajax.writeWordAnswer('{{exercise.ajax_exercise}}')" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">ответить</span></button>
+		</div>
+		<div class="clear"></div>
+	</form>
+</div>

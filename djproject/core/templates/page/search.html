@@ -1,0 +1,43 @@
+{% load custom_filters %}
+<p>Здесь вы можете найти любое слово, выражение или тэг.</p>
+<form>
+	<div class="fieldWrapper">
+		<input type="text" name="search-term" value="{{ term }}"/>
+	</div>
+	<div class="fieldWrapper">
+		<button onclick="EWT.ajax.post('{% url ajax_search %}')" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">найти</span></button>
+	</div>
+	<div class="clear"></div>
+</form>
+{% if term %}
+	{% if words or groups or sentences or translations %}
+		{% if words %}
+			<h2 class="partition">Найдено слов: {{ words.count }}.</h2>
+			{% for word in words %}
+				<a title="{{word.translation}}" class="ajax entity{% if forloop.counter|check_even %} odd{% endif %}" onclick="EWT.ajax.newTab('{{word.ajax_get}}')">{{ word|highlight:term|safe }}</a>
+			{% endfor %}
+		{% endif %}
+		{% if translations %}
+			<h2 class="partition">Найдено в переводе слов: {{ translations.count }}.</h2>
+			{% for word in translations %}
+				<a title="{{word.translation}}" class="ajax entity{% if forloop.counter|check_even %} odd{% endif %}" onclick="EWT.ajax.newTab('{{word.ajax_get}}')">{{ word }}</a>
+			{% endfor %}
+		{% endif %}
+		{% if groups %}
+			<h2 class="partition">Найдено тэгов: {{ groups.count }}.</h2>
+			{% for group in groups %}
+				<a class="ajax entity{% if forloop.counter|check_even %} odd{% endif %}" onclick="EWT.ajax.newTab('{{group.ajax_get}}')">{{ group|highlight:term|safe }}</a>
+			{% endfor %}
+		{% endif %}
+		{% if sentences %}
+			<h2 class="partition">Найдено выражений: {{ sentences.count }}.</h2>
+			{% for sentence in sentences %}
+				<a class="ajax entity{% if forloop.counter|check_even %} odd{% endif %}" onclick="EWT.ajax.newTab('{{sentence.ajax_get}}')">{{ sentence|highlight:term|safe }}</a>
+			{% endfor %}
+		{% endif %}
+	{% else %}
+		<h2 class="partition">Результаты поиска</h2>
+		<p>Ничего не найдено.</p>		
+	{% endif %}
+{% endif %}
+

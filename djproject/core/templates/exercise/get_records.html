@@ -1,0 +1,35 @@
+<div>
+	{% if entities.object_list %}
+		<form>
+			<table width="100%">
+				<tr>
+					<th><div><a class="ajax{% ifequal sort_by 'word' %} hover{% endifequal %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?sort=word', 'exercise-records')">сорт.</a></div></th>
+					<th width="40%"><div><a class="ajax{% ifequal sort_by 'timestamp' %} hover{% endifequal %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?sort=timestamp', 'exercise-records')">сорт.</a></div></th>
+					<th width="20%"><div><a class="ajax{% ifequal sort_by 'is_passed' %} hover{% endifequal %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?sort=is_passed', 'exercise-records')">сорт.</a></div></th>
+				</tr>
+			{% for record in entities.object_list %}
+				<tr {% if forloop.counter|divisibleby:"2" %} class="even" {% endif %}>
+					<td>
+						{% with record.word as word %}
+							{% include "word_snippet_exercise.html" %}
+						{% endwith %}
+					</td>
+					<td align="center">{{record.timestamp|date:"d.m.Y H:i:s"}}</td>
+					<td align="center">{% if record.is_passed %}правильно{% else %}неправильно{% endif %}</td>
+				</tr>
+			{% endfor %}
+			</table>
+		</form>
+	{% else %}
+		<p>Ничего нет, пока.</p>
+	{% endif %}
+</div>
+
+{% ifnotequal entities.paginator.num_pages 1 %} 
+	<div id="pagination">
+		{% for page_num in entities.paginator.page_range %}
+	        <a class="ajax{% ifequal page_num entities.number %} hover{% endifequal %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?page={{ page_num }}&sort={{ sort_by }}', 'exercise-records')">{{ page_num }}</a>
+		{% endfor %}
+	</div>
+{% endifnotequal %}
+

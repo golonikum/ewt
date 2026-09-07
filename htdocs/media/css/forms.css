@@ -1,0 +1,79 @@
+/* ====================================================================
+ * CSS for project EWT: form styles 
+ * developed: N.Golov
+ * created: 07.05.2010
+ * ====================================================================
+ */
+
+/* row division
+---------------------------------------------------------------------*/
+div.fieldWrapper {
+	clear: both;
+	/* :TODO: */
+	margin: 10px 0px;
+	padding: 10px 0px;
+}
+/* form elements
+---------------------------------------------------------------------*/
+.fieldWrapper label {
+	display: block;
+	width: 200px;
+	text-align: right;
+}
+.fieldWrapper span.form-colon {
+	display: block;
+	width: 20px;
+}
+.fieldWrapper input,
+.fieldWrapper label,
+.fieldWrapper textarea,
+.fieldWrapper select,
+.fieldWrapper button,
+.fieldWrapper ul.errorlist,
+.fieldWrapper span.form-colon {
+	float: left;
+}
+.fieldWrapper input,
+.fieldWrapper textarea,
+.fieldWrapper select {
+	width: 300px;
+	border: 1px solid #CBC7BD;
+	background: #ece8d9;
+	padding: 2px;
+}
+.fieldWrapper select {
+	width: 306px;
+}
+.fieldWrapper input[type=checkbox] {
+	width: inherit;
+}
+.fieldWrapper textarea {
+	height: 100px;
+}
+.fieldWrapper select {
+	/*max-height: 200px;*/
+}
+/* form errors
+---------------------------------------------------------------------*/
+.fieldWrapper ul.errorlist {
+	margin: 0;
+	padding-left: 10px;
+}
+.fieldWrapper ul.errorlist li {
+	/* :TODO: */
+	color: red;
+	list-style: none;
+}
+/* ajax setter
+---------------------------------------------------------------------*/
+input.ajax-setter {
+	border: 1px solid #CBC7BD;
+	background: #ece8d9;
+	padding: 2px;
+}
+input.ajax-setter:hover {
+	cursor: pointer;
+}
+input.ajax-number {
+	width: 3em;
+}

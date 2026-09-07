@@ -1,0 +1,24 @@
+{% load custom_filters %}
+{% include "menu/entity.html" %}
+<div class="entity">
+	<h1>
+	{% if sentence.word_set.all %}
+		{{ sentence.body|highlight_words:sentence.word_set.all|safe }}
+	{% else %}
+		{{ sentence.body }}
+	{% endif %}
+	</h1>
+	{% if sentence.translation %}
+		<h2 class="partition">Перевод</h2>
+		<p>{{ sentence.translation }}</p>
+	{% endif %}
+	<h2 class="partition">Слова в выражении <img class="edit-img" src="/media/imgs/edit.png" onclick="EWT.ajax.get('{{ sentence.ajax_change_words }}')" title="{%if sentence.word_set.all%}Изменить{%else%}Добавить{%endif%}" /></h2>
+	{% if sentence.word_set.all %}
+		{% for word in sentence.word_set.all %}
+			{% include "word_snippet.html" %}
+		{% endfor %}
+	{% endif %}
+	{% with sentence as entity %}
+		{% include "menu/entity_change.html" %}
+	{% endwith %}
+</div>

@@ -1,0 +1,52 @@
+<div class="entity">
+	{% block header %}{% endblock %}
+	<h2 class="partition">{% block entity-title %}{% endblock %}</h2>
+    <form method="post">
+	    <div class="fieldWrapper">
+	    	<select multiple="multiple" name="{% block select-name %}{% endblock %}" id="multiple_select">
+	    		{% block options %}{% endblock %}
+    		</select>
+		</div>
+	    <div class="fieldWrapper">
+			<button onclick="{% block save-link %}{% endblock %}" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">сохранить</span></button>		
+		</div>
+		<div class="clear"></div>
+	</form>
+	<h2 class="partition">{% block add-title %}{% endblock %}</h2>
+    <div class="fieldWrapper">
+		<input id="lookup_input"></input>
+	</div>
+    <div class="fieldWrapper">
+		<select id="lookup_select"></select>
+	</div>
+    <div class="fieldWrapper">
+		<button id="lookup_button" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">добавить</span></button>
+	</div>
+	<div class="clear"></div>
+	<script>	
+		$(document).ready(function(){
+			$("#lookup_input", EWT.utils.getActiveTab()).keypress(function(e){
+				if (e.keyCode == 13) {
+					var term = $(this).val();
+					$(this).blur();
+					EWT.ajax._doAjax('{% block lookup-link %}{% endblock %}', 'POST', {term: term, word_id: {% block word-id %}{% endblock %}}, null, function(result){
+						EWT.utils.showLoadingAnimation(false);
+						$("#lookup_select", EWT.utils.getActiveTab()).empty();
+						$("#lookup_select", EWT.utils.getActiveTab()).append(result);
+					});
+				}
+			});
+			$("#lookup_button", EWT.utils.getActiveTab()).click(function(){
+				$("#lookup_select option:selected", EWT.utils.getActiveTab()).each(function(){
+					var notExist = true;
+					var val = $(this).val();
+					$("select#multiple_select option", EWT.utils.getActiveTab()).each(function(){
+						if (val == $(this).val()) notExist = false;
+					});
+					if (notExist) $("#multiple_select", EWT.utils.getActiveTab()).append('<option value="' + $(this).val() + '" selected="1">' + $(this).html() + '</option>');
+				});
+			});
+		});
+	</script>
+</div>
+

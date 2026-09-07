@@ -1,0 +1,13 @@
+{% include "menu/entity.html" %}
+<div class="entity">
+	<h1>{{ group.name }}</h1>
+	<h2 class="partition">Слова: {{ group.word_set.all|length }} <img class="edit-img" src="/media/imgs/edit.png" onclick="EWT.ajax.get('{{ group.ajax_change_words }}')" title="{%if group.word_set.all%}Изменить{%else%}Добавить{%endif%}" /></h2>
+	{% if group.word_set.all %}
+		{% for word in group.word_set.all %}
+			{% include "word_snippet.html" %}
+		{% endfor %}
+	{% endif %}
+	{% with group as entity %}
+		{% include "menu/entity_change.html" %}
+	{% endwith %}
+</div>

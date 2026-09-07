@@ -1,0 +1,46 @@
+{% load custom_filters %}
+{% include "menu/entity.html" %}
+<div class="entity">
+	<h1>
+		{{ word.signature }}
+		{% if word.transcription %}
+			<span class="transcription">[{{ word.transcription }}]</span>
+		{% endif %}
+		<a class="outer" href="https://translate.yandex.ru/?utm_source=wizard&lang=en-ru&text={{word.signature}}" target="_blank" title="открыть словарную статью Яндекс.Словари"><img src="/media/imgs/yandex_icon.png"/></a>
+		<a class="outer" href="http://dictionary.cambridge.org/search/british/?q={{word.signature}}" target="_blank" title="Cambridge Dictionaries Online"><img src="/media/imgs/cambridge_icon.ico"/></a>
+		<a class="outer" href="http://wordnetweb.princeton.edu/perl/webwn?s={{word.signature}}" target="_blank" title="открыть WordNet Search 3.0"><img src="/media/imgs/princeton_icon.ico"/></a>
+		<a class="outer" href="http://www.thefreedictionary.com/{{word.signature}}" target="_blank" title="открыть TheFreeDictionary"><img src="/media/imgs/freedict_icon.ico"/></a>
+	</h1>
+	<p class="speech_part">{{ word.speech_part }}</p>
+	<h2 class="partition">Перевод</h2>
+	<pre>{{ word.translation }}</pre>
+	
+	<h2 class="partition">Тэги <img class="edit-img" src="/media/imgs/edit.png" onclick="EWT.ajax.get('{{ word.ajax_change_groups }}')" title="{%if word.groups.all%}Изменить{%else%}Добавить{%endif%}" /></h2>
+	{% if word.groups.all %}
+		{% for g in word.groups.all %}
+			<a class="ajax entity{% if forloop.counter|check_even %} odd{% endif %}" onclick="EWT.ajax.get('{{g.ajax_get}}')">{{g}}</a>
+		{% endfor %}
+	{% endif %}
+
+	<h2 class="partition">Синонимы <img class="edit-img" src="/media/imgs/edit.png" onclick="EWT.ajax.get('{{ word.ajax_change_synonyms }}')" title="{%if word.synonyms.all%}Изменить{%else%}Добавить{%endif%}" /></h2>
+	{% if word.synonyms.all %}
+		{% for word in word.synonyms.all %}
+			{% include "word_snippet.html" %}
+		{% endfor %}
+	{% endif %}
+
+	<h2 class="partition">Выражения <img class="edit-img" src="/media/imgs/edit.png" onclick="EWT.ajax.get('{{ word.ajax_change_sentences }}')" title="{%if word.sentences.all%}Изменить{%else%}Добавить{%endif%}" /></h2>
+	{% if word.sentences.all %}
+		{% for sentence in word.sentences.all %}
+			{% ifequal word.user sentence.user %}
+				<a class="ajax entity{% if forloop.counter|check_even %} odd{% endif %}" onclick="EWT.ajax.get('{{sentence.ajax_get}}')">{{sentence}}</a>
+			{% endifequal %} 
+			{% ifnotequal word.user sentence.user %}
+				{{w}}
+			{% endifnotequal %} 
+		{% endfor %}
+	{% endif %}
+	{% with word as entity %}
+		{% include "menu/entity_change.html" %}
+	{% endwith %}
+</div>

@@ -1,0 +1,12 @@
+{% load custom_filters %}
+{% include "exercise/show_total.html" %}
+<div class="entity">
+	<h1>{{ next_word }}</h1>
+	{% for word in variants.0 %}
+		<p {% if not forloop.counter|check_even %}class="odd"{% endif %}><a class="ajax" onclick="EWT.utils.showAlert('Вы ответили', 'Неверно', null, null, null, 'color:red'); EWT.ajax.get('{{exercise.ajax_exercise}}?w={{next_word.id}}&p=0')">{{word.translation}}</a></p>
+	{% endfor %}
+	<p {% if variants.0|length|check_even %}class="odd"{% endif %}><a class="ajax" onclick="EWT.utils.showAlert('Вы ответили', 'Верно', null, null, null, 'color:green'); EWT.ajax.get('{{exercise.ajax_exercise}}?w={{next_word.id}}&p=1')">{{next_word.translation}}</a></p>
+	{% for word in variants.1 %}
+		<p {% if not forloop.counter|check_even and not variants.0|length|check_even or forloop.counter|check_even and variants.0|length|check_even  %}class="odd"{% endif %}><a class="ajax" onclick="EWT.utils.showAlert('Вы ответили', 'Неверно', null, null, null, 'color:red'); EWT.ajax.get('{{exercise.ajax_exercise}}?w={{next_word.id}}&p=0')">{{word.translation}}</a></p>
+	{% endfor %}
+</div>

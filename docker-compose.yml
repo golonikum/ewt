@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:9.6
+    environment:
+      POSTGRES_DB: etrainer_golonru
+      POSTGRES_USER: etrainer_golonru
+      POSTGRES_PASSWORD: your_secure_password_here
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: python djproject/docker_start.py
+    expose:
+      - "8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=True
+      - USE_TEMPLATE_CACHE=1
+      - GUNICORN_WORKERS=3
+      - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+      - DB_NAME=etrainer_golonru
+      - DB_USER=etrainer_golonru
+      - DB_PASSWORD=your_secure_password_here
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SECRET_KEY=your_secret_key_here
+      - ADMIN_EMAIL=admin@golonikum.net
+      - EMAIL_HOST=smtp.hostfabrica.ru
+      - EMAIL_PORT=25
+      - EMAIL_HOST_USER=admin@golonikum.net
+      - EMAIL_HOST_PASSWORD=your_secure_email_password_here
+      - SERVER_EMAIL=smtp.hostfabrica.ru
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx.Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:

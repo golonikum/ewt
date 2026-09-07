@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+    <head>
+        <title>English Words Trainer: Тренажер английских слов</title>
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+		<link rel="shortcut icon" href="/media/imgs/favicon.png" />
+        <link rel="stylesheet" type="text/css" href="/media/css/common.css" />
+		
+		<script type="text/javascript" src="/media/js/libs/jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="/media/js/libs/jquery.loadmask.min.js"></script>
+		<script type="text/javascript" src="/media/js/libs/jquery.jplayer.min.js"></script>
+		<script type="text/javascript" src="/media/js/libs/jquery.dimensions.min.js"></script>
+		<script type="text/javascript" src="/media/js/libs/jquery.tooltip.min.js"></script>
+		<script type="text/javascript" src="/media/js/libs/jquery-ui-1.8.custom.min.js"></script>
+		<script type="text/javascript" src="/media/js/libs/jquery.ui.datepicker-ru.js"></script>
+		<script type="text/javascript" src="/media/js/libs/jquery.cookie.js"></script>
+		<script type="text/javascript" src="/media/js/libs/jquery.transcription.js"></script>
+		<script type="text/javascript" src="/media/js/libs/ajaxupload.js"></script>
+		<script type="text/javascript" src="/media/js/libs/cufon-yui.js"></script>
+		<script type="text/javascript" src="/media/js/libs/cufon-menu-font.js"></script>
+		<script type="text/javascript" src="/media/js/libs/cufon-logo-font.js"></script>
+		<script type="text/javascript" src="/media/js/libs/perfect-scrollbar.jquery.min.js"></script>
+		
+		<script type="text/javascript">window.EWT_CSRF_TOKEN = '{{ csrf_token }}';</script>
+		<script type="text/javascript" src="/media/js/app/base.js"></script>
+		<script type="text/javascript" src="/media/js/app/player.js"></script>
+		<script type="text/javascript" src="/media/js/app/siteconfig.js"></script>
+		<script type="text/javascript" src="/media/js/app/utils.js"></script>
+		<script type="text/javascript" src="/media/js/app/tab_manager.js"></script>
+		<script type="text/javascript" src="/media/js/app/ajax.js"></script>
+		<script type="text/javascript" src="/media/js/app/entry_point.js"></script>
+    </head>
+    <body>
+        <!--div id="logo">
+			<h1>English Words Trainer</h1>
+		</div-->
+        <ul id="menu">
+            <li>
+                <a onclick="EWT.ajax.newTab('{% url ajax_page "word" %}')" title="показать все мои слова">Слова</a>
+            </li>
+            <li>
+                <a onclick="EWT.ajax.newTab('{% url ajax_page "group" %}')" title="показать все мои тэги">Тэги</a>
+            </li>
+            <li>
+                <a onclick="EWT.ajax.newTab('{% url ajax_page "sentence" %}')" title="показать все мои выражения">Выражения</a>
+            </li>
+            <li>
+                <a onclick="EWT.ajax.newTab('{% url ajax_page "exercise" %}')" title="посмотреть мои упражнения">Упражнения</a>
+            </li>
+            <li>
+                <a onclick="EWT.ajax.newTab('{% url ajax_search %}')" title="найти слово, тэг или выражение">Поиск</a>
+            </li>
+            <li>
+                <a onclick="EWT.ajax.newTab('{% url ajax_page "config" %}')" title="посмотреть мои настройки">Настройки</a>
+            </li>
+			<li id="username"><span>{{ user.username }}</span></li>
+            <li id="logout">
+                <a onclick="window.location.href='{% url logout %}'" title="покинуть систему">Выход</a>
+            </li>
+			<li class="clear">&nbsp;</li>
+        </ul>
+        <div id="content">
+			<ul>
+				<li><a href="#tabs-1">Главная</a> <!--span class="ui-icon ui-icon-close">Закрыть</span--></li>
+			</ul>
+			<div id="tabs-1">{% block content %}{% endblock %}</div>
+        </div>
+        <!--div id="footer">
+        	<div id="links">
+	        	<a class="outer" href="http://www.mozilla.com/ru/" target="_blank"><img src="/media/imgs/icon-ff.png" /></a>
+	        	<a class="outer" href="http://www.djangoproject.com/" target="_blank"><img src="/media/imgs/icon-django.png" /></a>
+	        	<a class="outer" href="http://jquery.com/" target="_blank"><img src="/media/imgs/icon-jquery.png" /></a>
+	        	<a class="outer" href="http://jqueryui.com/" target="_blank"><img src="/media/imgs/icon-jqueryui.png" /></a>
+				<br />
+	        	<a class="outer" href="http://cufon.shoqolate.com/generate/" target="_blank"><img src="/media/imgs/icon-cufon.png" /></a>
+	        	<a class="outer" href="http://aptana.org/" target="_blank"><img src="/media/imgs/icon-aptana.png" /></a>
+	        	<a class="outer" href="http://www.happyworm.com/jquery/jplayer/" target="_blank"><img src="/media/imgs/icon-jplayer.png" /></a> 
+	        	<a class="outer" href="http://pixelmixer.ru/" target="_blank"><img src="/media/imgs/icon-pm.png" /></a> 
+			</div> 
+			<div id="subscribe">
+				&copy; 2010 designed & developed by <a href="mailto:goloniko@gmail.com">golonikum</a>
+			</div> 
+        </div-->
+    </body>
+</html>

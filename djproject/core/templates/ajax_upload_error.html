@@ -1,0 +1,9 @@
+<div class="ajax-error">
+	Ошибка обработки файла.
+	{% if error.args.0 %} 
+		{{ error.args.0 }}
+	{% endif %}
+	{% if error.args.1 %} 
+		{{ error.args.1 }}
+	{% endif %}			
+</div> 

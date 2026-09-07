@@ -1,0 +1,9 @@
+{% extends "entity/change_base.html" %}
+{% block header %}
+	<h1>
+		{{ word.signature }}
+	</h1>
+	<p class="speech_part">{{ word.speech_part }}</p>
+{% endblock %}
+{% block word-id %}{{word.id}}{% endblock %}
+

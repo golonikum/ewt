@@ -1,0 +1,35 @@
+@import url(pepper-grinder/jquery-ui-1.8.custom.css);
+
+body {
+	background: url(../imgs/b003.jpg) fixed;
+}
+
+div#dialog-content {
+	margin-right: 20px;
+	margin-left: 20px;
+}
+
+div.ui-dialog {
+	box-shadow: 0px 0px 10px #000;
+    border: 1px solid #555;
+}
+
+div.form-row {
+	margin: 10px 0;
+	text-align: right;
+}
+
+div.submit-row {
+	text-align: right;
+}
+
+div.error {
+	color: #DD3C40;
+	margin: 10px 0;
+	text-align: center;
+}
+
+span.ui-dialog-title {
+	font-size: 1.5em;
+	font-weight: bold;
+}

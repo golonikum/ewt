@@ -1,0 +1,7 @@
+<div class="ajax-error">
+	{% if debug %}
+		{{ error }}		
+	{% else %}
+		Произошла внутренняя ошибка на сервере. Обратитесь к <a href="mailto:{{admin_mail}}">администратору</a>.
+	{% endif %}
+</div> 

@@ -1,0 +1,5 @@
+AddDefaultCharset utf-8
+DirectoryIndex index.html index.htm index.shtml index.phtml index.php
+SetEnv PYTHON_EGG_CACHE /home/g/golonru/etrainer/djproject/.python-egg
+PassengerAppRoot /home/g/golonru/etrainer/djproject
+PassengerPython /usr/bin/python2

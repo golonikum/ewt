@@ -1,0 +1,17 @@
+/* ====================================================================
+ * CSS for project EWT: common 
+ * developed: N.Golov
+ * created: 07.05.2010
+ * ====================================================================
+ */
+
+/* my own styles
+---------------------------------------------------------------------*/
+@import url(decoration.css);
+@import url(forms.css);
+
+/* another author's styles
+---------------------------------------------------------------------*/
+@import url(pepper-grinder/jquery-ui-1.8.custom.css);
+@import url(jquery-loadmask/jquery-loadmask.css);
+@import url(perfect-scrollbar/perfect-scrollbar.min.css);
