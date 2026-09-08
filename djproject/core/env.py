@@ -19,15 +19,16 @@ DB_PASSWORD = get_env_variable('DB_PASSWORD')
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
 DB_PORT = os.environ.get('DB_PORT', '5432')
 
-# Email settings
-EMAIL_HOST = get_env_variable('EMAIL_HOST')
+# Email and admin settings are optional: mail delivery is not required to serve
+# the site, so missing values must not stop the process from starting.
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
 EMAIL_PORT = os.environ.get('EMAIL_PORT', '25')
-EMAIL_HOST_USER = get_env_variable('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = get_env_variable('EMAIL_HOST_PASSWORD')
-SERVER_EMAIL = get_env_variable('SERVER_EMAIL')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', 'root@localhost')
 
 # Admin settings
-ADMIN_EMAIL = get_env_variable('ADMIN_EMAIL')
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@localhost')
 
 # Secret key
 SECRET_KEY = get_env_variable('SECRET_KEY')

@@ -31,4 +31,8 @@ ENV PYTHONUNBUFFERED 1
 # Открываем порт 8000
 EXPOSE 8000
 
-# Команда для запуска задаётся в docker-compose.yml (gunicorn + nginx)
+# Команда по умолчанию. docker-compose.yml задаёт её же явно, но без CMD
+# образ наследует от базового python:2.7-slim запуск интерпретатора, который
+# без TTY сразу получает EOF и завершается — платформы, запускающие образ
+# напрямую (render.com, northflank), видят это как "Application exited early".
+CMD ["python", "djproject/docker_start.py"]

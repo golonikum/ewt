@@ -44,12 +44,15 @@ def main():
     except Exception as exc:
         print("loaddata skipped: %s" % exc)
     ensure_admin()
-    workers = os.environ.get("GUNICORN_WORKERS", "3")
+    # WEB_CONCURRENCY is what PaaS providers set based on instance size
+    workers = os.environ.get("GUNICORN_WORKERS") or os.environ.get("WEB_CONCURRENCY") or "3"
     # CSV import of a few thousand words runs well past the 30s default
     timeout = os.environ.get("GUNICORN_TIMEOUT", "300")
+    # PORT is injected by the host platform; nginx expects 8000 locally
+    port = os.environ.get("PORT", "8000")
     os.execvp("gunicorn", [
         "gunicorn",
-        "--bind", "0.0.0.0:8000",
+        "--bind", "0.0.0.0:%s" % port,
         "--workers", workers,
         "--timeout", timeout,
         "--access-logfile", "-",
