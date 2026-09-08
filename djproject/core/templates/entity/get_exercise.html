@@ -26,11 +26,11 @@
 	{% if exercise.record_set.all %}
 		<h2 class="partition">Результаты</h2>
 		<p>Пройдено слов - {{exercise.record_set.all|length}}, из них правильно - {{exercise.record_set|get_success}}, неправильно - {{exercise.record_set|get_failed}}.</p>
-		{% ifnotequal exercise.record_set.all|length 0 %}
+		{% if exercise.record_set.all|length != 0 %}
 			<div id="exercise-records">
 				<a class="ajax" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}', 'exercise-records')">посмотреть</a>
 			</div>
-		{% endifnotequal %}
+		{% endif %}
 	{% endif %}
 	{% if not exercise.finished %}
 		<div class="ajax-menu">

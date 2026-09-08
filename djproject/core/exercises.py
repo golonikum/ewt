@@ -1,11 +1,11 @@
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from datetime import datetime
 import random
 from core.models import Word, Group, Record, Exercise
 from core.decorators import *
 from core.config import get_config_obj
 from core.entities import get_paginator
-import settings 
+from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
 #*********************************************************
@@ -20,7 +20,7 @@ def exercise(request, id):
     words_dict = {'all': all_words_len, 'success': success_words_len, 'failed': all_words_len - len(remain_words) - success_words_len} 
     if remain_words:
         next_word = remain_words[random.randint(0, len(remain_words) - 1)]
-        return show_next_word(exercise, next_word, request.user, words_dict)
+        return show_next_word(request, exercise, next_word, request.user, words_dict)
     else:
         exercise.finished = datetime.now()
         exercise.save()
@@ -31,7 +31,7 @@ def exercise(request, id):
         msg.attach_alternative(mail_html_content, "text/html")
         msg.send(fail_silently=True)
         #send_mail('[ETRAINER] Errors in exercise %s' % exercise.title, mail_text, settings.ADMIN_EMAIL, ['goloniko@gmail.com'])
-        return render_to_response('exercise/end.html', {'words': words_dict, 'exercise': exercise})            
+        return render(request, 'exercise/end.html', {'words': words_dict, 'exercise': exercise})
 
 @exception_wrapper(ajax_upload_error)
 @auth_required
@@ -40,7 +40,7 @@ def get_records(request, id):
     entities_per_page = get_config_obj(request).entities_per_page
     sort_by = request.GET.get('sort', '?')
     paged_entities = get_paginator(get_sorted_records(request.user, exercise, sort_by), request.GET.get('page', '1'), entities_per_page)
-    return render_to_response('exercise/get_records.html', {'exercise': exercise, 'entities': paged_entities, 'sort_by': sort_by})
+    return render(request, 'exercise/get_records.html', {'exercise': exercise, 'entities': paged_entities, 'sort_by': sort_by})
 
 
 #*********************************************************
@@ -105,26 +105,26 @@ def new_record(word, exercise, is_passed):
         word.save()
         Record.objects.create(word=word, exercise=exercise, is_passed=is_passed)
 
-def show_next_word(exercise, next_word, user, words_dict):
+def show_next_word(request, exercise, next_word, user, words_dict):
     if exercise.exercise_type.id == 1:
-        return show_choose_translation(exercise, next_word, user, words_dict)
+        return show_choose_translation(request, exercise, next_word, user, words_dict)
     elif exercise.exercise_type.id == 2:
-        return show_write_word(exercise, next_word, words_dict)
+        return show_write_word(request, exercise, next_word, words_dict)
     elif exercise.exercise_type.id == 3:
-        return show_sentences(exercise, next_word, words_dict)
+        return show_sentences(request, exercise, next_word, words_dict)
     
-def show_choose_translation(exercise, next_word, user, words_dict):
+def show_choose_translation(request, exercise, next_word, user, words_dict):
     except_list = [next_word] + list(next_word.synonyms.all()) 
     variants = [w for w in list(Word.objects.filter(user=user, speech_part=next_word.speech_part).order_by('?')) if w not in except_list][:5]
     slice_num = random.randint(0, 5)
     variants = [variants[:slice_num], variants[slice_num:]]
-    return render_to_response('exercise/choose_translation.html', {'next_word': next_word, 'variants': variants, 'exercise': exercise, 'words': words_dict})    
+    return render(request, 'exercise/choose_translation.html', {'next_word': next_word, 'variants': variants, 'exercise': exercise, 'words': words_dict})
 
-def show_write_word(exercise, next_word, words_dict):
-    return render_to_response('exercise/write_word.html', {'word': next_word, 'exercise': exercise, 'words': words_dict})
+def show_write_word(request, exercise, next_word, words_dict):
+    return render(request, 'exercise/write_word.html', {'word': next_word, 'exercise': exercise, 'words': words_dict})
 
-def show_sentences(exercise, next_word, words_dict):
-    return render_to_response('exercise/sentences.html', {'w': [next_word], 'exercise': exercise, 'words': words_dict})
+def show_sentences(request, exercise, next_word, words_dict):
+    return render(request, 'exercise/sentences.html', {'w': [next_word], 'exercise': exercise, 'words': words_dict})
 
 def get_sorted_records(user, exercise, sort_by):
     if sort_by not in ['word', 'timestamp', 'is_passed']:

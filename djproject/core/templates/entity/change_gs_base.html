@@ -4,11 +4,11 @@
 {% block select-name %}words{% endblock %}
 {% block options %}
 	{% for w in entity.word_set.all %}
-		{% ifequal entity.user w.user %}
+		{% if entity.user == w.user %}
 			<option value="{{w.id}}" selected="1">{{w}}</option>
-		{% endifequal %} 
+		{% endif %} 
 	{% endfor %}
 {% endblock %}
 {% block save-link %}EWT.ajax.post('{{ entity.ajax_change_words }}'){% endblock %}
-{% block lookup-link %}{% url ajax_change_get_entities 'words' %}{% endblock %}
+{% block lookup-link %}{% url 'ajax_change_get_entities' 'words' %}{% endblock %}
 {% block word-id %}0{% endblock %}

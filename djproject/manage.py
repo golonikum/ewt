@@ -2,7 +2,6 @@
 
 import os
 import sys
-sys.path.insert(0,'/usr/lib/python2.7/site-packages/django-1.4')
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")

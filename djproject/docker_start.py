@@ -36,9 +36,13 @@ def ensure_admin():
 
 
 def main():
+    # Populates the app registry; required before models or the ORM are touched
+    # from a plain script rather than through manage.py.
+    import django
+    django.setup()
     wait_for_db()
     from django.core.management import call_command
-    call_command("syncdb", interactive=False)
+    call_command("migrate", interactive=False)
     try:
         call_command("loaddata", "core/fixtures/initial_data.json")
     except Exception as exc:

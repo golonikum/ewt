@@ -32,12 +32,12 @@
 	<h2 class="partition">Выражения <img class="edit-img" src="/media/imgs/edit.png" onclick="EWT.ajax.get('{{ word.ajax_change_sentences }}')" title="{%if word.sentences.all%}Изменить{%else%}Добавить{%endif%}" /></h2>
 	{% if word.sentences.all %}
 		{% for sentence in word.sentences.all %}
-			{% ifequal word.user sentence.user %}
+			{% if word.user == sentence.user %}
 				<a class="ajax entity{% if forloop.counter|check_even %} odd{% endif %}" onclick="EWT.ajax.get('{{sentence.ajax_get}}')">{{sentence}}</a>
-			{% endifequal %} 
-			{% ifnotequal word.user sentence.user %}
+			{% endif %} 
+			{% if word.user != sentence.user %}
 				{{w}}
-			{% endifnotequal %} 
+			{% endif %} 
 		{% endfor %}
 	{% endif %}
 	{% with word as entity %}

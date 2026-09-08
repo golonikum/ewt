@@ -20,6 +20,13 @@ msgid "Groups"
 msgstr "Тэги"
 
 #: .\core\forms.py:36
+msgid "Speech Parts"
+msgstr "Части речи"
+
+msgid "Select an option"
+msgstr "Выберите вариант"
+
+#: .\core\forms.py:37
 msgid "From Date"
 msgstr "Слова с"
 

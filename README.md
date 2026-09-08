@@ -22,13 +22,13 @@
 
 | Компонент | Версия |
 |---|---|
-| Python | 2.7 |
-| Django | 1.4.22 |
-| PostgreSQL | 9.6 |
-| Gunicorn | 19.7 |
+| Python | 3.13 |
+| Django | 6.1 |
+| PostgreSQL | 17 |
+| Gunicorn | 23.0 |
 | nginx | 1.20 (раздача статики, прокси) |
 
-Версии зафиксированы: код написан под Django 1.4 и на новых версиях не запустится.
+Django 6.1 требует Python 3.12+ и PostgreSQL 15+.
 
 ## Быстрый старт в Docker
 
@@ -51,7 +51,7 @@ cp .env.example .env    # Windows: copy .env.example .env
 При старте контейнера `web` скрипт `djproject/docker_start.py` автоматически:
 
 1. ждёт готовности PostgreSQL;
-2. создаёт таблицы (`syncdb` — в Django 1.4 ещё нет `migrate`);
+2. применяет миграции (`migrate`);
 3. загружает начальные данные (части речи и типы упражнений) из `djproject/core/fixtures/initial_data.json`;
 4. создаёт суперпользователя, если его ещё нет;
 5. запускает Gunicorn.
@@ -62,7 +62,7 @@ cp .env.example .env    # Windows: copy .env.example .env
 
 - **nginx** — принимает запросы на порту 8000, сам отдаёт статику из `/media/` и проксирует остальное в Django
 - **web** — Gunicorn с тремя воркерами
-- **db** — PostgreSQL, данные хранятся в томе `postgres_data`
+- **db** — PostgreSQL, данные хранятся в томе `postgres17_data`
 
 Код копируется в образ, а не монтируется с хоста (bind-mount на Windows заметно замедляет работу). **После изменения кода нужна пересборка:**
 
@@ -77,7 +77,7 @@ docker compose logs -f web          # логи приложения
 docker compose ps                   # статус сервисов
 docker compose down                 # остановить
 docker compose down -v              # остановить и удалить данные БД
-docker compose exec -w /app/djproject web python manage.py syncdb
+docker compose exec -w /app/djproject web python manage.py migrate
 ```
 
 Админка Django — http://localhost:8000/admin/
@@ -94,6 +94,7 @@ docker compose exec -w /app/djproject web python manage.py syncdb
 | `DB_HOST`, `DB_PORT` | нет | по умолчанию `localhost` и `5432` |
 | `SECRET_KEY` | да | ключ Django |
 | `ALLOWED_HOSTS` | при `DEBUG=False` | домены через запятую; Django проверяет заголовок `Host` |
+| `CSRF_TRUSTED_ORIGINS` | нет | origins со схемой через запятую; Django 4+ сверяет заголовок `Origin` при POST |
 | `ADMIN_EMAIL` | да | адрес администратора |
 | `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `SERVER_EMAIL` | да | параметры SMTP |
 | `DEBUG` | нет | `True` включает режим отладки |
@@ -133,8 +134,8 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
   ```
 - **При `DEBUG=False` Django перестаёт отдавать `/media/`** (маршрут в `djproject/urls.py` объявлен внутри `if settings.DEBUG`), поэтому nginx перед приложением обязателен.
 - **Смена `SECRET_KEY` инвалидирует сессии** — все пользователи будут разлогинены.
-- Почта по умолчанию уходит в консольный backend. Для реальной отправки задайте `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend` и рабочий SMTP: у Django 1.4 нет таймаута на отправку, поэтому недоступный сервер способен занять воркер.
-- Python 2.7, Django 1.4 и PostgreSQL 9.6 сняты с поддержки и не получают обновлений безопасности. Не выставляйте приложение в открытый интернет без внешнего ограничения доступа.
+- Почта по умолчанию уходит в консольный backend. Для реальной отправки задайте `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend` и рабочий SMTP: недоступный сервер способен занять воркер.
+- При `DEBUG=False` шаблонов `404.html` и `500.html` в проекте нет, поэтому несуществующий URL отдаёт 500 вместо 404.
 
 ## Структура проекта
 
@@ -191,12 +192,12 @@ backup/                 пример CSV для импорта
 
 ## Запуск без Docker
 
-Нужны Python 2.7 и PostgreSQL. Зависимости — в `requirements.txt`.
+Нужны Python 3.12+ и PostgreSQL 15+. Зависимости — в `requirements.txt`.
 
 ```bash
 pip install -r requirements.txt
 cd djproject
-python manage.py syncdb
+python manage.py migrate
 python manage.py loaddata core/fixtures/initial_data.json
 python manage.py createsuperuser
 python manage.py runserver
@@ -204,7 +205,7 @@ python manage.py runserver
 
 Переменные окружения из таблицы выше должны быть выставлены в оболочке — иначе `settings.py` завершится с `ImproperlyConfigured`.
 
-`runserver` в Django 1.4 однопоточный и сам отдаёт статику, поэтому подходит только для локальной разработки.
+`runserver` сам отдаёт статику и не рассчитан на нагрузку, поэтому подходит только для локальной разработки.
 
 ## Лицензия
 

@@ -1,11 +1,11 @@
 <h2 class="partition">Количество элементов на странице</h2>
-<p><input title="Нажмите чтобы изменить" type="text" class="ajax-setter ajax-number" name="entities_per_page" href="{% url ajax_entities_per_page %}" value="{{config.entities_per_page}}"/></p>
+<p><input title="Нажмите чтобы изменить" type="text" class="ajax-setter ajax-number" name="entities_per_page" href="{% url 'ajax_entities_per_page' %}" value="{{config.entities_per_page}}"/></p>
 <h2 class="partition">Экспорт/импорт данных</h2>
-<p>Экпортировать все мои слова и выражения в <a class="ajax" style="text-decoration:underline" onclick="EWT.ajax.get('{% url export 'csv' %}')">CSV файл</a>.</p>
-<p>Экпортировать все мои выражения в <a class="ajax" style="text-decoration:underline" onclick="EWT.ajax.get('{% url export 'html' %}')">HTML файл</a>.</p>
-<p>Импортировать слова из <a id="upload_button" href="{% url ajax_csv_import %}">CSV файла</a>.</p>
+<p>Экпортировать все мои слова и выражения в <a class="ajax" style="text-decoration:underline" onclick="EWT.ajax.get('{% url 'export' 'csv' %}')">CSV файл</a>.</p>
+<p>Экпортировать все мои выражения в <a class="ajax" style="text-decoration:underline" onclick="EWT.ajax.get('{% url 'export' 'html' %}')">HTML файл</a>.</p>
+<p>Импортировать слова из <a id="upload_button" href="{% url 'ajax_csv_import' %}">CSV файла</a>.</p>
 <h2 class="partition">Очистка</h2>
-<p><a class="ajax" style="text-decoration:underline" onclick="EWT.ajax.remove('{% url ajax_remove_all %}')">Удалить</a> все слова, тэги и выражения.</p>
+<p><a class="ajax" style="text-decoration:underline" onclick="EWT.ajax.remove('{% url 'ajax_remove_all' %}')">Удалить</a> все слова, тэги и выражения.</p>
 <script>
 	$(document).ready(function(){
 		new AjaxUpload($('#upload_button', EWT.utils.getActiveTab()), {

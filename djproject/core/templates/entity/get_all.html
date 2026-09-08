@@ -5,24 +5,24 @@
 		<form>
 			<table width="100%">
 				<tr>
-					<th><div><a class="ajax{% ifequal sort_by 'name' %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=name')">сорт.</a></div></th>
+					<th><div><a class="ajax{% if sort_by == 'name' %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=name')">сорт.</a></div></th>
 					{% if entities.object_list.0.signature %}
-						<th width="15%"><div><a class="ajax{% ifequal sort_by 'speech_part__name' %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=speech_part__name')">сорт.</a></div></th>
-						<th width="12%"><div><a class="ajax{% ifequal sort_by 'success' %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=success')">верно</a></div></th>
-						<th width="12%"><div><a class="ajax{% ifequal sort_by 'failed' %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=failed')">неверно</a></div></th>
-						<th width="12%"><div><a class="ajax{% ifequal sort_by 'is_active' %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=is_active')">актив</a></div></th>
+						<th width="15%"><div><a class="ajax{% if sort_by == 'speech_part__name' %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=speech_part__name')">сорт.</a></div></th>
+						<th width="12%"><div><a class="ajax{% if sort_by == 'success' %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=success')">верно</a></div></th>
+						<th width="12%"><div><a class="ajax{% if sort_by == 'failed' %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=failed')">неверно</a></div></th>
+						<th width="12%"><div><a class="ajax{% if sort_by == 'is_active' %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=is_active')">актив</a></div></th>
 					{% endif %}
 					{% if entities.object_list.0.name %}
-						<th width="15%"><div><a class="ajax{% ifequal sort_by 'word_set' %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=word_set')">сорт.</a></div></th>
+						<th width="15%"><div><a class="ajax{% if sort_by == 'word_set' %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=word_set')">сорт.</a></div></th>
 					{% endif %}
 					{% if entities.object_list.0.title %}
-						<th width="20%"><div><a class="ajax{% ifequal sort_by 'exercise_type' %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=exercise_type')">сорт.</a></div></th>
-						<th width="15%"><div><a class="ajax{% ifequal sort_by 'created' %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=created')">сорт.</a></div></th>
-						<th width="15%"><div><a class="ajax{% ifequal sort_by 'finished' %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=finished')">сорт.</a></div></th>
+						<th width="20%"><div><a class="ajax{% if sort_by == 'exercise_type' %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=exercise_type')">сорт.</a></div></th>
+						<th width="15%"><div><a class="ajax{% if sort_by == 'created' %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=created')">сорт.</a></div></th>
+						<th width="15%"><div><a class="ajax{% if sort_by == 'finished' %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=finished')">сорт.</a></div></th>
 						<th width="5%"><div>верно</div></th>
 						<th width="5%"><div>неверно</div></th>
 					{% else %}
-						<th width="15%"><div><a class="ajax{% ifequal sort_by 'created' %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=created')">сорт.</a></div></th>
+						<th width="15%"><div><a class="ajax{% if sort_by == 'created' %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?sort=created')">сорт.</a></div></th>
 					{% endif %}
 					<th width="10%"><div><a class="ajax" onclick="EWT.utils.invertCheckboxes(true)">инверт.</a></div></th>
 				</tr>
@@ -68,8 +68,8 @@
 		<div class="ajax-menu">
 			<a class="ajax" onclick="EWT.ajax.removeSome('{{Entity.ajax_remove_some}}', false)">удалить</a>
 			{% if entities.object_list.0.signature %}
-			| <a class="ajax" onclick="EWT.ajax.removeSome('{% url ajax_set_words_active %}', true)">актив</a> |
-			<a class="ajax" onclick="EWT.ajax.removeSome('{% url ajax_set_words_inactive %}', true)">неактив</a>
+			| <a class="ajax" onclick="EWT.ajax.removeSome('{% url 'ajax_set_words_active' %}', true)">актив</a> |
+			<a class="ajax" onclick="EWT.ajax.removeSome('{% url 'ajax_set_words_inactive' %}', true)">неактив</a>
 			{% endif %}
 		</div>
 	{% else %}
@@ -77,10 +77,10 @@
 	{% endif %}
 </div>
 
-{% ifnotequal entities.paginator.num_pages 1 %} 
+{% if entities.paginator.num_pages != 1 %} 
 	<div id="pagination">
 		{% for page_num in entities.paginator.page_range %}
-	        <a class="ajax{% ifequal page_num entities.number %} hover{% endifequal %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?page={{ page_num }}&sort={{ sort_by }}')">{{ page_num }}</a>
+	        <a class="ajax{% if page_num == entities.number %} hover{% endif %}" onclick="EWT.ajax.get('{{Entity.ajax_get_all}}?page={{ page_num }}&sort={{ sort_by }}')">{{ page_num }}</a>
 		{% endfor %}
 	</div>
-{% endifnotequal %}
+{% endif %}

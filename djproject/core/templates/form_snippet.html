@@ -1,17 +1,17 @@
 {% for field in form %}
-	{% ifequal field.label_tag|striptags "Слова с" %}
+	{% if field.label == "Слова с" %}
 		<script>
 			$(document).ready(function(){
 				$("#id_from_date", EWT.utils.getActiveTab()).datepicker({dateFormat: 'yy-mm-dd'});
 				$("#id_to_date", EWT.utils.getActiveTab()).datepicker({dateFormat: 'yy-mm-dd'});
 			});
 		</script>
-	{% endifequal %}
+	{% endif %}
     <div class="fieldWrapper">
-        {{ field.label_tag }}<span class="form-colon">: </span>{{ field }}
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label><span class="form-colon">: </span>{{ field }}
 		{{ field.errors }}
     </div>
-	{% ifequal field.label_tag|striptags "Транскрипция" %}
+	{% if field.label == "Транскрипция" %}
 		<div id="keyboard" style="width:306px;"></div>
 		<script>
 			$(document).ready(function(){
@@ -20,5 +20,5 @@
 				});
 			});
 		</script>
-	{% endifequal %}
+	{% endif %}
 {% endfor %}

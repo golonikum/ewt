@@ -5,7 +5,7 @@ register = template.Library()
 
 @register.filter
 def highlight(value, word):
-	return unicode(value).replace(word, '<span class="hl">%s</span>' % word)
+	return str(value).replace(word, '<span class="hl">%s</span>' % word)
 
 def build_word_regexp(word):
 	w = str(word.signature)
@@ -105,7 +105,7 @@ def build_word_regexp(word):
 			if re.search(r'smb.$', w):
 				w = w[:-5]
 			if w.find("smb.") != -1:
-				w = w.replace("smb.", '(me|you|him|her|them|us|[^\.\?!]+)')
+				w = w.replace("smb.", r'(me|you|him|her|them|us|[^\.\?!]+)')
 			if re.search(r'smth.$', w):
 				w = w.replace('smth.', '')
 			if w.find('smth.') != -1:
@@ -135,7 +135,7 @@ def highlight_words(value, words, with_title=False):
 	for word in words:
 		w = build_word_regexp(word)
 		if with_title:
-			s = re.sub(r'(' + w + r')', r'<span class="hl" title="%s">\1</span>' % word.translation.encode('utf_8'), s)
+			s = re.sub(r'(' + w + r')', r'<span class="hl" title="%s">\1</span>' % word.translation, s)
 		else:
 			s = re.sub(r'(' + w + r')', r'<span class="hl">\1</span>', s)
 	return s

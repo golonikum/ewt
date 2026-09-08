@@ -1,5 +1,5 @@
-# Используем официальный Python 2.7 образ
-FROM python:2.7-slim
+# Django 6.1 поддерживает Python 3.12, 3.13 и 3.14
+FROM python:3.13-slim
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -9,12 +9,7 @@ COPY requirements.txt .
 
 # Устанавливаем зависимости.
 # Все пакеты ставятся из готовых wheel, поэтому компилятор и apt не нужны:
-# базовый образ основан на Debian buster, чьи репозитории уехали в архив
-# и при сборке на чужой машине периодически недоступны.
-#
-# Django 1.4 старше формата wheel, и его setup.py при попытке сборки печатает
-# "Django 1.4 does not support wheel. This error is safe to ignore." —
-# pip действительно игнорирует это и ставит пакет через setup.py install.
+# psycopg[binary] содержит собранный libpq.
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем код приложения
@@ -32,7 +27,7 @@ ENV PYTHONUNBUFFERED 1
 EXPOSE 8000
 
 # Команда по умолчанию. docker-compose.yml задаёт её же явно, но без CMD
-# образ наследует от базового python:2.7-slim запуск интерпретатора, который
+# образ наследует от базового образа запуск интерпретатора, который
 # без TTY сразу получает EOF и завершается — платформы, запускающие образ
 # напрямую (render.com, northflank), видят это как "Application exited early".
 CMD ["python", "djproject/docker_start.py"]

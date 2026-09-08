@@ -5,7 +5,7 @@
 		<input type="text" name="search-term" value="{{ term }}"/>
 	</div>
 	<div class="fieldWrapper">
-		<button onclick="EWT.ajax.post('{% url ajax_search %}')" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">найти</span></button>
+		<button onclick="EWT.ajax.post('{% url 'ajax_search' %}')" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">найти</span></button>
 	</div>
 	<div class="clear"></div>
 </form>

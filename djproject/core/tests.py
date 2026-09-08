@@ -1,5 +1,5 @@
 # coding=utf-8
-import unittest
+from django.test import TestCase
 from core.config import get_csv_from_words, get_words_from_csv, process_sentences
 from core.models import Word, SpeechPart, Sentence, Group
 from django.http import HttpResponse
@@ -7,7 +7,12 @@ from django.contrib.auth.models import User
 from datetime import datetime
 
 
-class get_csv_from_words_TestCase(unittest.TestCase):
+# Django only creates the test database for cases that declare they need one,
+# and initial_data.json is no longer auto-loaded, so the speech parts these
+# tests look up have to be requested explicitly.
+class get_csv_from_words_TestCase(TestCase):
+    fixtures = ['initial_data.json']
+
     def setUp(self):
         self.default_sp = SpeechPart.objects.all()[0]
         self.user = User.objects.create(username='User', password='12345')
@@ -20,7 +25,7 @@ class get_csv_from_words_TestCase(unittest.TestCase):
         for i in range(2):
             self.words.append(Word.objects.create(created=datetime.now(), user=self.user, signature='word'+str(i), translation='tr of word'+str(i), speech_part=self.default_sp, transcription='tran of word'+str(i)))
         response = get_csv_from_words(HttpResponse(), self.words)
-        reader = response.content.split('\r\n')
+        reader = response.content.decode('utf-8').split('\r\n')
         for i, line in enumerate(reader):
             if i == 0:
                 self.assertEqual(line, "signature;translation;speech part;transcription;synonyms;sentences;groups")
@@ -32,7 +37,7 @@ class get_csv_from_words_TestCase(unittest.TestCase):
         sentence = Sentence.objects.create(created=datetime.now(), user=self.user, body='sentence')
         self.words[0].sentences.add(sentence)
         response = get_csv_from_words(HttpResponse(), self.words)
-        reader = response.content.split('\r\n')
+        reader = response.content.decode('utf-8').split('\r\n')
         for i, line in enumerate(reader):
             if i > 0 and i < len(self.words):
                 self.assertEqual(line, "%s;%s;%s;%s;;sentence;" % (self.words[i].signature, self.words[i].translation, self.words[i].speech_part, self.words[i].transcription))
@@ -44,7 +49,7 @@ class get_csv_from_words_TestCase(unittest.TestCase):
         self.words[0].sentences.add(sentence1)
         self.words[0].sentences.add(sentence2)
         response = get_csv_from_words(HttpResponse(), self.words)
-        reader = response.content.split('\r\n')
+        reader = response.content.decode('utf-8').split('\r\n')
         for i, line in enumerate(reader):
             if i > 0 and i < len(self.words):
                 self.assertEqual(line, "%s;%s;%s;%s;;sentence1[tr of sentence1], sentence2[tr of sentence2];" % (self.words[i].signature, self.words[i].translation, self.words[i].speech_part, self.words[i].transcription))
@@ -52,12 +57,14 @@ class get_csv_from_words_TestCase(unittest.TestCase):
     def test_success_unicode(self):
         self.words = [Word.objects.create(created=datetime.now(), user=self.user, signature='word', translation=u'перевод', speech_part=self.default_sp, transcription=u'\x0296\x105\x089')]
         response = get_csv_from_words(HttpResponse(), self.words)
-        reader = response.content.split('\r\n')
+        reader = response.content.decode('utf-8').split('\r\n')
         for i, line in enumerate(reader):
             if i > 0 and i < len(self.words):
                 self.assertEqual(line, "%s;%s;%s;%s;;;" % (self.words[i].signature, self.words[i].translation, self.words[i].speech_part, self.words[i].transcription))
 
-class get_words_from_csv_TestCase(unittest.TestCase):
+class get_words_from_csv_TestCase(TestCase):
+    fixtures = ['initial_data.json']
+
     def setUp(self):
         self.default_sp = SpeechPart.objects.all()[0]
         self.user = User.objects.create(username='User', password='12345')
@@ -256,13 +263,15 @@ class get_words_from_csv_TestCase(unittest.TestCase):
         self.assertEqual(0, len(Sentence.objects.all()))
         self.assertEqual(1, len(Word.objects.all()))
         
-class process_sentences_TestCase(unittest.TestCase):
+class process_sentences_TestCase(TestCase):
+    fixtures = ['initial_data.json']
+
     def setUp(self):
         self.default_sp = SpeechPart.objects.all()[0]
         self.user = User.objects.create(username='User2', password='12345')
         self.csv_data = list()
-        self.word = Word.objects.create(created=datetime.now(), 
-								   user=self.user, 
+        self.word = Word.objects.create(created=datetime.now(),
+                                   user=self.user,
                                    signature='word', 
                                    translation='translation',
                                    speech_part=self.default_sp)

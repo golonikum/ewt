@@ -4,11 +4,11 @@
 {% block select-name %}sentences{% endblock %}
 {% block options %}
 	{% for s in word.sentences.all %}
-		{% ifequal word.user s.user %}
+		{% if word.user == s.user %}
 			<option value="{{s.id}}" selected="1">{{s}}</option>
-		{% endifequal %} 
+		{% endif %} 
 	{% endfor %}
 {% endblock %}
 {% block save-link %}EWT.ajax.post('{{ word.ajax_change_sentences }}'){% endblock %}
-{% block lookup-link %}{% url ajax_change_get_entities 'sentences' %}{% endblock %}
+{% block lookup-link %}{% url 'ajax_change_get_entities' 'sentences' %}{% endblock %}
 

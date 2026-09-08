@@ -23,7 +23,7 @@
 		    <!-- Content -->
 		    <div id="dialog-content">
 
-				<form action="{% url index %}" method="post" id="login-form">
+				<form action="{% url 'index' %}" method="post" id="login-form">
 					{% csrf_token %}
 				  	<div class="form-row">
 				    	<label for="id_username">Логин:</label> <input type="text" name="username" id="id_username" />

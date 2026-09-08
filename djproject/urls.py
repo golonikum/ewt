@@ -1,21 +1,21 @@
-from django.conf.urls.defaults import *
-from django.contrib import admin
 from django.conf import settings
-import core
+from django.contrib import admin
+from django.urls import include, re_path
+from django.views.static import serve
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = [
     # Admin site
-    (r'^admin/', include(admin.site.urls)),
-)
+    re_path(r'^admin/', admin.site.urls),
+]
 
 if settings.DEBUG:
-    urlpatterns += patterns('',
-        (r'^media/(.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT})
-    )
-    
-urlpatterns += patterns('',
-    # Common 
-    (r'^', include('core.urls')),
-)
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
+
+urlpatterns += [
+    # Common
+    re_path(r'^', include('core.urls')),
+]

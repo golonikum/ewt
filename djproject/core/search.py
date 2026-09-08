@@ -1,5 +1,4 @@
-from django.shortcuts import render_to_response
-from django.utils.encoding import force_unicode
+from django.shortcuts import render
 from core.decorators import *
 from core.models import Word, Group, Sentence
 
@@ -7,12 +6,11 @@ from core.models import Word, Group, Sentence
 @auth_required
 def search(request):
     if request.method == 'POST':
-        term = unicode(request.POST.get('search-term', '').strip())
+        term = str(request.POST.get('search-term', '').strip())
         translations = Word.objects.filter(user=request.user, translation__contains=term)
         words = Word.objects.filter(user=request.user, signature__contains=term)
         groups = Group.objects.filter(user=request.user, name__contains=term)
         sentences = Sentence.objects.filter(user=request.user, body__contains=term)
     else:
         term = ''
-    return render_to_response('page/search.html', locals())
-
+    return render(request, 'page/search.html', locals())

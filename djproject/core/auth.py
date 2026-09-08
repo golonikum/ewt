@@ -9,20 +9,17 @@ from core.decorators import *
 #*********************************************************
 @ensure_csrf_cookie
 def index(request):
-    if not request.user.is_authenticated():
-        if request.method == 'GET':
-            return render(request, 'auth.html')
-        elif request.method == 'POST':
-            username = request.POST['username']
-            password = request.POST['password']
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return render(request, 'index.html', {'user': user})
-            else:
-                return render(request, 'auth.html', {'error_message': 'Пожалуйста, введите верные имя пользователя и пароль.'})            
-    else:
+    if request.user.is_authenticated:
         return render(request, 'index.html', {'user': request.user})
+    if request.method != 'POST':
+        return render(request, 'auth.html')
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        login(request, user)
+        return render(request, 'index.html', {'user': user})
+    return render(request, 'auth.html', {'error_message': 'Пожалуйста, введите верные имя пользователя и пароль.'})
 
 @auth_required
 def exit(request):

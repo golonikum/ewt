@@ -38,26 +38,26 @@
 		</div-->
         <ul id="menu">
             <li>
-                <a onclick="EWT.ajax.newTab('{% url ajax_page "word" %}')" title="показать все мои слова">Слова</a>
+                <a onclick="EWT.ajax.newTab('{% url 'ajax_page' "word" %}')" title="показать все мои слова">Слова</a>
             </li>
             <li>
-                <a onclick="EWT.ajax.newTab('{% url ajax_page "group" %}')" title="показать все мои тэги">Тэги</a>
+                <a onclick="EWT.ajax.newTab('{% url 'ajax_page' "group" %}')" title="показать все мои тэги">Тэги</a>
             </li>
             <li>
-                <a onclick="EWT.ajax.newTab('{% url ajax_page "sentence" %}')" title="показать все мои выражения">Выражения</a>
+                <a onclick="EWT.ajax.newTab('{% url 'ajax_page' "sentence" %}')" title="показать все мои выражения">Выражения</a>
             </li>
             <li>
-                <a onclick="EWT.ajax.newTab('{% url ajax_page "exercise" %}')" title="посмотреть мои упражнения">Упражнения</a>
+                <a onclick="EWT.ajax.newTab('{% url 'ajax_page' "exercise" %}')" title="посмотреть мои упражнения">Упражнения</a>
             </li>
             <li>
-                <a onclick="EWT.ajax.newTab('{% url ajax_search %}')" title="найти слово, тэг или выражение">Поиск</a>
+                <a onclick="EWT.ajax.newTab('{% url 'ajax_search' %}')" title="найти слово, тэг или выражение">Поиск</a>
             </li>
             <li>
-                <a onclick="EWT.ajax.newTab('{% url ajax_page "config" %}')" title="посмотреть мои настройки">Настройки</a>
+                <a onclick="EWT.ajax.newTab('{% url 'ajax_page' "config" %}')" title="посмотреть мои настройки">Настройки</a>
             </li>
 			<li id="username"><span>{{ user.username }}</span></li>
             <li id="logout">
-                <a onclick="window.location.href='{% url logout %}'" title="покинуть систему">Выход</a>
+                <a onclick="window.location.href='{% url 'logout' %}'" title="покинуть систему">Выход</a>
             </li>
 			<li class="clear">&nbsp;</li>
         </ul>

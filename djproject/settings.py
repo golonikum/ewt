@@ -1,10 +1,14 @@
 import os
 from core.env import DEBUG, SECRET_KEY, ADMIN_EMAIL, EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, SERVER_EMAIL, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
-TEMPLATE_DEBUG = DEBUG
-
 # Django validates the Host header against this list whenever DEBUG is False
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '*').split(',') if h.strip()]
+
+# Django 4+ compares the browser Origin header to Host. Extra origins (with
+# scheme) go here; nginx must also forward $http_host so the port is kept.
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()
+]
 
 ADMINS = (
     ('admin', ADMIN_EMAIL),
@@ -14,10 +18,14 @@ DEFAULT_CHARSET = 'utf-8'
 
 MANAGERS = ADMINS
 
+# Existing tables use 32-bit integer primary keys; keep them to avoid a
+# schema migration that only widens the id columns.
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # DATABASE
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', 
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': DB_NAME,
         'USER': DB_USER,
         'PASSWORD': DB_PASSWORD,
@@ -33,57 +41,74 @@ EMAIL_BACKEND = os.environ.get(
 )
 
 TIME_ZONE = 'Europe/Moscow'
-LANGUAGE_CODE = 'ru-RU'
+LANGUAGE_CODE = 'ru'
 SITE_ID = 1
 USE_I18N = True
+# The models store naive local datetimes, so timezone support stays off.
+USE_TZ = False
 # SECRET_KEY is imported from env.py
 
 ROOT_URL = '/'
-STATIC_ROOT = ''
 # Templates and admin assets are served under /media/ (production nginx path).
-# runserver's StaticFilesHandler intercepts STATIC_URL, so STATICFILES_DIRS
-# must point at the same tree. MEDIA_URL must stay distinct from STATIC_URL.
+# STATICFILES_DIRS must point at the same tree.
 STATIC_URL = '/media/'
 _DJPROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 _PROJECT_ROOT = os.path.dirname(_DJPROJECT_DIR)
 _MEDIA_DIR = os.environ.get('MEDIA_ROOT', os.path.join(_PROJECT_ROOT, 'htdocs', 'media'))
 MEDIA_ROOT = _MEDIA_DIR
+STATIC_ROOT = os.path.join(_PROJECT_ROOT, 'staticfiles')
 STATICFILES_DIRS = (_MEDIA_DIR,)
 ROOT_URLCONF = 'urls'
-
-
-FIXTURE_DIRS = (
-   os.path.join(_DJPROJECT_DIR, 'core', 'fixtures'),
+LOCALE_PATHS = (
+    os.path.join(_DJPROJECT_DIR, 'locale'),
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.static',
-    'django.contrib.auth.context_processors.auth',
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.request',
-)
+# core/fixtures is the app's default fixture directory and is found
+# automatically; listing it in FIXTURE_DIRS is rejected as a duplicate.
+
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
-TEMPLATE_LOADERS = (
+
+_TEMPLATE_LOADERS = [
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-)
+]
 if os.environ.get('USE_TEMPLATE_CACHE') == '1':
-    TEMPLATE_LOADERS = (
-        ('django.template.loaders.cached.Loader', TEMPLATE_LOADERS),
-    )
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
+    _TEMPLATE_LOADERS = [
+        ('django.template.loaders.cached.Loader', _TEMPLATE_LOADERS),
+    ]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'OPTIONS': {
+            'debug': DEBUG,
+            'loaders': _TEMPLATE_LOADERS,
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.template.context_processors.csrf',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 )
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -93,12 +118,3 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'core',
 )
-
-#if DEBUG:
-#    MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
-#    INSTALLED_APPS += ('debug_toolbar',)
-#    DEBUG_TOOLBAR_CONFIG = {
-#        'EXCLUDE_URLS': ('/admin',), 
-#        'INTERCEPT_REDIRECTS': False,
-#    }
-#    INTERNAL_IPS = ('127.0.0.1',)

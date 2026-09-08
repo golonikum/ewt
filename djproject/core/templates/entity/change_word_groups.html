@@ -4,10 +4,10 @@
 {% block select-name %}groups{% endblock %}
 {% block options %}
 	{% for g in word.groups.all %}
-		{% ifequal word.user g.user %}
+		{% if word.user == g.user %}
 			<option value="{{g.id}}" selected="1">{{g}}</option>
-		{% endifequal %} 
+		{% endif %} 
 	{% endfor %}
 {% endblock %}
 {% block save-link %}EWT.ajax.post('{{ word.ajax_change_groups }}'){% endblock %}
-{% block lookup-link %}{% url ajax_change_get_entities 'groups' %}{% endblock %}
+{% block lookup-link %}{% url 'ajax_change_get_entities' 'groups' %}{% endblock %}

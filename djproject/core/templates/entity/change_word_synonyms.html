@@ -4,10 +4,10 @@
 {% block select-name %}synonyms{% endblock %}
 {% block options %}
 	{% for s in word.synonyms.all %}
-		{% ifequal word.user s.user %}
+		{% if word.user == s.user %}
 			<option value="{{s.id}}" selected="1">{{s}}</option>
-		{% endifequal %} 
+		{% endif %} 
 	{% endfor %}
 {% endblock %}
 {% block save-link %}EWT.ajax.post('{{ word.ajax_change_synonyms }}'){% endblock %}
-{% block lookup-link %}{% url ajax_change_get_entities 'words' %}{% endblock %}
+{% block lookup-link %}{% url 'ajax_change_get_entities' 'words' %}{% endblock %}

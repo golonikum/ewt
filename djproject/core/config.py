@@ -1,9 +1,8 @@
 # coding=utf-8
 from django.template.loader import get_template
-from django.template import Context
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
-from django.utils.encoding import force_unicode
+from django.shortcuts import render
+from django.utils.encoding import force_str
 from django.db import transaction
 import csv, re
 from datetime import datetime
@@ -17,38 +16,38 @@ from core.forms import ExportForm
 @exception_wrapper(ajax_upload_error)
 @auth_required
 def export(request, what):
-	if request.method == 'GET':
-		form = ExportForm(request.user)
-		return render_to_response('page/export_%s.html' % what, {'form': form})
-	else:
-		response = HttpResponse(mimetype='text/csv')
-		form = ExportForm(request.user, request.POST)
-		if form.is_valid(): 
-			words = Word.objects.filter(user=request.user)
-			cleaned = form.cleaned_data
-			if cleaned['from_date']:
-				words = words.filter(created__gte=cleaned['from_date'])
-			if cleaned['to_date']:
-				words = words.filter(created__lte=cleaned['to_date'])
-			if cleaned['groups']:
-				words = words.filter(groups__in=cleaned['groups'])
-			if cleaned['speechparts']:
-				words = words.filter(speech_part__in=cleaned['speechparts'])
-			words = words.distinct()
-			response['Content-Disposition'] = ('attachment; filename=%s' % (what == 'csv' and 'words.csv' or 'sentences_%s.html' % cleaned['from_date'],))
-			return what == 'csv' and get_csv_from_words(response, words) or get_html_from_words(response, words)
-		else:
-			response['Content-Disposition'] = 'attachment; filename=errors.log'			 	
-			return get_export_errors(response, form.errors)
+    if request.method == 'GET':
+        form = ExportForm(request.user)
+        return render(request, 'page/export_%s.html' % what, {'form': form})
+    else:
+        response = HttpResponse(content_type='text/csv')
+        form = ExportForm(request.user, request.POST)
+        if form.is_valid():
+            words = Word.objects.filter(user=request.user)
+            cleaned = form.cleaned_data
+            if cleaned['from_date']:
+                words = words.filter(created__gte=cleaned['from_date'])
+            if cleaned['to_date']:
+                words = words.filter(created__lte=cleaned['to_date'])
+            if cleaned['groups']:
+                words = words.filter(groups__in=cleaned['groups'])
+            if cleaned['speechparts']:
+                words = words.filter(speech_part__in=cleaned['speechparts'])
+            words = words.distinct()
+            response['Content-Disposition'] = ('attachment; filename=%s' % (what == 'csv' and 'words.csv' or 'sentences_%s.html' % cleaned['from_date'],))
+            return what == 'csv' and get_csv_from_words(response, words) or get_html_from_words(response, words)
+        else:
+            response['Content-Disposition'] = 'attachment; filename=errors.log'
+            return get_export_errors(response, form.errors)
 
 @exception_wrapper(ajax_upload_error)
 @auth_required
-@transaction.commit_on_success
+@transaction.atomic
 def csv_import(request):
     if request.method == 'POST':
         file = request.FILES['userfile']
         words = get_words_from_csv(read_csv_file(file), request.user)
-        return render_to_response('ajax_success.html', {'message':  u'Успешно! Всего слов загружено - %d.' % len(words)})
+        return render(request, 'ajax_success.html', {'message':  u'Успешно! Всего слов загружено - %d.' % len(words)})
     else:
         raise Exception
 
@@ -74,12 +73,12 @@ def set_entities_per_page(request):
 #*********************************************************
 def get_config_page(request):
     config = get_config_obj(request)
-    return render_to_response('page/config.html', locals())
+    return render(request, 'page/config.html', locals())
 
 def get_config_obj(request):
     try:
         config = Config.objects.get(user=request.user)
-    except Config.DoesNotExist, e:
+    except Config.DoesNotExist as e:
         Config.objects.create(user=request.user)
     config = Config.objects.get(user=request.user)
     return config
@@ -93,12 +92,12 @@ def get_csv_from_words(response, words):
     writer.writerow(['signature', 'translation', 'speech part', 'transcription', 'synonyms', 'sentences', 'groups'])
     for word in words:
         writer.writerow([word.signature,
-                         word.translation.encode('utf_8'), 
-                         word.speech_part, 
-                         word.transcription.encode('utf_8'),
-                         (', '.join([synonym.signature for synonym in word.synonyms.all()])).encode('utf_8'),
-                         (' | '.join([sentence.translation and '%s[%s]' % (sentence.body, sentence.translation) or sentence.body for sentence in word.sentences.all()])).encode('utf_8'),
-                         (', '.join([group.name for group in word.groups.all()])).encode('utf_8')
+                         word.translation,
+                         word.speech_part,
+                         word.transcription,
+                         ', '.join([synonym.signature for synonym in word.synonyms.all()]),
+                         ' | '.join([sentence.translation and '%s[%s]' % (sentence.body, sentence.translation) or sentence.body for sentence in word.sentences.all()]),
+                         ', '.join([group.name for group in word.groups.all()])
                          ])
     return response
 
@@ -111,7 +110,7 @@ def get_html_from_words(response, words):
     sentences = Sentence.objects.filter(word__in=words)
     sentences = sentences.distinct()
     t = get_template('page/sentences_export.html')
-    response.write(t.render(Context({'sentences': sentences, 'words': words})))
+    response.write(t.render({'sentences': sentences, 'words': words}))
     return response
 
 def get_export_errors(response, errors):
@@ -121,13 +120,15 @@ def get_export_errors(response, errors):
     return response
 
 def read_csv_file(file):
-    csv_data = str()
+    # Uploaded chunks are bytes; decode once the whole payload is assembled.
+    csv_data = b''
     for chunk in file.chunks():
         csv_data += chunk
     # Uploads arrive with CRLF, LF or CR endings, and Excel may prepend a BOM
-    if csv_data.startswith('\xef\xbb\xbf'):
+    if csv_data.startswith(b'\xef\xbb\xbf'):
         csv_data = csv_data[3:]
-    return csv_data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
+    text = csv_data.decode('utf-8')
+    return text.replace('\r\n', '\n').replace('\r', '\n').split('\n')
 
 def get_words_from_csv(csv_data, user):
     '''
@@ -150,17 +151,17 @@ def get_words_from_csv(csv_data, user):
                 if len(row) == 7:
                     # checking data: signature and translation can't be empty
                     if not (row[0] and row[1]):
-                        raise ValueError('Неправильный формат данных: отсутствует слово и/или перевод.', 'Строка %d.' % i.__add__(1))
+                        raise ValueError('Неправильный формат данных: отсутствует слово и/или перевод.', 'Строка %d.' % (i + 1))
                     words.append(get_word(row, user, speech_parts))
                 # checking data: number of words
                 elif len(row) != 0:
-                    raise ValueError('Неправильный формат данных: число столбцов должно быть равно 7.', 'Строка %d.' % i.__add__(1))
-    except Exception, e:
+                    raise ValueError('Неправильный формат данных: число столбцов должно быть равно 7.', 'Строка %d.' % (i + 1))
+    except Exception as e:
         # if we created words, we must remove them
         for word in words:
-        	if word.created > now:
-        		word.delete();
-        raise e   
+            if word.created > now:
+                word.delete()
+        raise e
     return process_words(words)
                 
 def get_speech_part(name, cache=None):
@@ -193,21 +194,20 @@ def get_word(row, user, speech_parts=None):
     '''
     sp = get_speech_part(row[2], speech_parts)
     # create word object
-    words = Word.objects.filter(user=user, signature=row[0], speech_part=sp, translation=force_unicode(row[1]))
+    words = Word.objects.filter(user=user, signature=row[0], speech_part=sp, translation=force_str(row[1]))
     if len(words) == 0:
-    	word = Word.objects.create(user=user, 
+        word = Word.objects.create(user=user,
                                signature=row[0], 
-                               translation=force_unicode(row[1]),
+                               translation=force_str(row[1]),
                                speech_part=sp,
-                               transcription=force_unicode(row[3]),
+                               transcription=force_str(row[3]),
                                created=datetime.now())
     else:
-    	word = words[0]
+        word = words[0]
     # save synonyms, groups and sentences 
     # with word object for following processing
-    word.temp = dict({'synonyms': row[4].strip(), 'sentences': force_unicode(row[5].strip()), 'groups': force_unicode(row[6].strip())})
+    word.temp = dict({'synonyms': row[4].strip(), 'sentences': force_str(row[5].strip()), 'groups': force_str(row[6].strip())})
     return word
-
 
 def process_words(words):
     '''
@@ -228,7 +228,7 @@ def process_synonyms(word, index=0):
         for synonym in word.temp['synonyms'].split(', '):
             try:
                 w = Word.objects.filter(user=word.user, signature=synonym, speech_part=word.speech_part)[0]
-            except Exception, e:
+            except Exception as e:
                 # Try to get phrase, verb synonyms.
                 sp = None
                 if word.speech_part.name == 'verb':
@@ -241,7 +241,7 @@ def process_synonyms(word, index=0):
                         w = w[0]
                     else:
                         w = None
-                else:	
+                else:
                     w = None
             if w != None:
                 word.synonyms.add(w)
@@ -256,7 +256,7 @@ def process_groups(word, index=0):
         for group in word.temp['groups'].split(', '):
             try:
                 g = Group.objects.get(name=group, user=word.user)
-            except Group.DoesNotExist, e:
+            except Group.DoesNotExist as e:
                 g = Group.objects.create(name=group, user=word.user, created=datetime.now())
             word.groups.add(g)
 
@@ -272,11 +272,8 @@ def process_sentences(word, index=0):
                 (body, t, translation) = reg.groups()
                 try:
                     s = Sentence.objects.get(body=body, user=word.user)
-                except Sentence.DoesNotExist, e:
+                except Sentence.DoesNotExist as e:
                     s = Sentence.objects.create(user=word.user, body=body, translation=translation, created=datetime.now())
                 word.sentences.add(s)
             except Exception:
                 pass
-
-
-

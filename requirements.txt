@@ -1,4 +1,3 @@
-Django==1.4.22
-gunicorn==19.7.1
-# Binary wheel: avoids needing gcc/libpq-dev on an EOL Debian base image
-psycopg2-binary==2.8.6
+Django==6.1
+gunicorn==23.0.0
+psycopg[binary]==3.2.9

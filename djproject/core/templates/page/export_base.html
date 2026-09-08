@@ -1,8 +1,9 @@
 <h2 class="partition">{% block title %}{% endblock %}</h2>
 <form method="post" action="{% block export-url %}{% endblock %}">
+	{% csrf_token %}
 	{% for field in form %}
     	<div class="fieldWrapper">
-        	{{ field.label_tag }}<span class="form-colon">: </span>{{ field }}
+        	<label for="{{ field.id_for_label }}">{{ field.label }}</label><span class="form-colon">: </span>{{ field }}
 			{{ field.errors }}
     	</div>
 		<script>

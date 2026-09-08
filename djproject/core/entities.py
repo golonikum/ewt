@@ -1,5 +1,5 @@
 # coding=utf-8
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render
 from django.db.models import Count
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from datetime import datetime
@@ -19,14 +19,14 @@ def get_all(request, entity):
     entities_per_page = get_config_obj(request).entities_per_page
     sort_by = request.GET.get('sort', '?')
     paged_entities = get_paginator(get_sorted_entities(request.user, Entity, sort_by), request.GET.get('page', '1'), entities_per_page)
-    return render_to_response('entity/get_all.html', {'Entity': Entity, 'entities': paged_entities, 'sort_by': sort_by})
+    return render(request, 'entity/get_all.html', {'Entity': Entity, 'entities': paged_entities, 'sort_by': sort_by})
 
 @exception_wrapper(ajax_error)
 @auth_required
 def get(request, entity, id):
     Entity = get_class(entity)
     obj = Entity.objects.get(id=int(id))
-    return render_to_response('entity/get_%s.html' % entity, {entity: obj, 'Entity': Entity})
+    return render(request, 'entity/get_%s.html' % entity, {entity: obj, 'Entity': Entity})
 
 @exception_wrapper(ajax_error)
 @auth_required
@@ -70,7 +70,7 @@ def set_words_inactive(request):
 @auth_required
 def page(request, name):
     if name == 'index':
-        return render_to_response('page/%s.html' % name)
+        return render(request, 'page/%s.html' % name)
     elif name in ['word', 'group', 'sentence', 'exercise']:
         return get_all(request, name)
     elif name == 'config':
@@ -79,46 +79,46 @@ def page(request, name):
 @exception_wrapper(ajax_error)
 @auth_required
 def change_word(request, id, what):
-	"""
-	what = 'sentences' || 'groups' || 'synonyms'
-	"""
-	word = Word.objects.get(id=int(id), user=request.user)
-	if what in ['synonyms', 'groups', 'sentences']:
-		if request.method == 'GET':
-			return render_to_response('entity/change_word_%s.html' % (what,), {'word': word})
-		else:
-			getattr(word, what).clear()
-			entities = request.POST.getlist(what)
-			if entities:
-				for e in entities:
-					getattr(word, what).add(get_change_class(what).objects.get(id=int(e)))
-				word.save()
-			return get(request, 'word', id)
-	else:
-		raise ValueError('Incorrect request.')    
+    """
+    what = 'sentences' || 'groups' || 'synonyms'
+    """
+    word = Word.objects.get(id=int(id), user=request.user)
+    if what in ['synonyms', 'groups', 'sentences']:
+        if request.method == 'GET':
+            return render(request, 'entity/change_word_%s.html' % (what,), {'word': word})
+        else:
+            getattr(word, what).clear()
+            entities = request.POST.getlist(what)
+            if entities:
+                for e in entities:
+                    getattr(word, what).add(get_change_class(what).objects.get(id=int(e)))
+                word.save()
+            return get(request, 'word', id)
+    else:
+        raise ValueError('Incorrect request.')
 
 @exception_wrapper(ajax_error)
 @auth_required
 def change_words(request, id, who):
-	"""
-	who = 'sentence' || 'group'
-	"""
-	entity = get_class(who).objects.get(id=int(id), user=request.user)
-	if request.method == 'GET':
-		return render_to_response('entity/change_%s.html' % who, {'entity': entity})
-	else:
-		entity.word_set.clear()
-		words = request.POST.getlist('words')
-		if words:
-			for w in words:
-				entity.word_set.add(Word.objects.get(id=int(w)))
-			entity.save()
-		return get(request, who, id)
+    """
+    who = 'sentence' || 'group'
+    """
+    entity = get_class(who).objects.get(id=int(id), user=request.user)
+    if request.method == 'GET':
+        return render(request, 'entity/change_%s.html' % who, {'entity': entity})
+    else:
+        entity.word_set.clear()
+        words = request.POST.getlist('words')
+        if words:
+            for w in words:
+                entity.word_set.add(Word.objects.get(id=int(w)))
+            entity.save()
+        return get(request, who, id)
 
 @exception_wrapper(ajax_error)
 @auth_required
 def change_get_entities(request, what):
-    term = unicode(request.POST.get('term', '')).strip()
+    term = str(request.POST.get('term', '')).strip()
     word_id = request.POST.get('word_id', '')
     if word_id == '':
         raise ValueError('Param "word_id" cannot be null.')
@@ -130,8 +130,8 @@ def change_get_entities(request, what):
         entities = Group.objects.filter(user=request.user, name__contains=term)
     else:
         entities = Sentence.objects.filter(user=request.user, body__contains=term)
-    return render_to_response('entity/change_get_entities.html', {'entities': entities})
-	
+    return render(request, 'entity/change_get_entities.html', {'entities': entities})
+
 #*********************************************************
 #******************** INNER FUNCTIONS
 #*********************************************************
@@ -153,7 +153,7 @@ def add_update(request, entity, id=None):
             if not id:
                 new_entity.created = datetime.now()
             new_entity.save()
-            return render_to_response('entity/get_%s.html' % entity, {entity: new_entity, 'Entity': classObj})
+            return render(request, 'entity/get_%s.html' % entity, {entity: new_entity, 'Entity': classObj})
     else:
         form = formCls(request.user, instance=obj) 
 

@@ -1,12 +1,15 @@
 services:
   db:
-    image: postgres:9.6
+    # Django 6.1 требует PostgreSQL 15 или новее
+    image: postgres:17
     environment:
       POSTGRES_DB: ${DB_NAME:-etrainer_golonru}
       POSTGRES_USER: ${DB_USER:-etrainer_golonru}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-dev-insecure-password}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      # Separate volume from the Postgres 9.6 era: a 9.6 data directory cannot
+      # be read by 17, and keeping the old one intact leaves it recoverable.
+      - postgres17_data:/var/lib/postgresql/data
 
   web:
     build: .
@@ -18,6 +21,7 @@ services:
     environment:
       - DEBUG=${DEBUG:-True}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:-}
       - USE_TEMPLATE_CACHE=${USE_TEMPLATE_CACHE:-1}
       - GUNICORN_WORKERS=${GUNICORN_WORKERS:-3}
       - GUNICORN_TIMEOUT=${GUNICORN_TIMEOUT:-300}
@@ -47,4 +51,4 @@ services:
       - web
 
 volumes:
-  postgres_data:
+  postgres17_data:

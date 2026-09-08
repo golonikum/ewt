@@ -3,9 +3,9 @@
 		<form>
 			<table width="100%">
 				<tr>
-					<th><div><a class="ajax{% ifequal sort_by 'word' %} hover{% endifequal %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?sort=word', 'exercise-records')">сорт.</a></div></th>
-					<th width="40%"><div><a class="ajax{% ifequal sort_by 'timestamp' %} hover{% endifequal %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?sort=timestamp', 'exercise-records')">сорт.</a></div></th>
-					<th width="20%"><div><a class="ajax{% ifequal sort_by 'is_passed' %} hover{% endifequal %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?sort=is_passed', 'exercise-records')">сорт.</a></div></th>
+					<th><div><a class="ajax{% if sort_by == 'word' %} hover{% endif %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?sort=word', 'exercise-records')">сорт.</a></div></th>
+					<th width="40%"><div><a class="ajax{% if sort_by == 'timestamp' %} hover{% endif %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?sort=timestamp', 'exercise-records')">сорт.</a></div></th>
+					<th width="20%"><div><a class="ajax{% if sort_by == 'is_passed' %} hover{% endif %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?sort=is_passed', 'exercise-records')">сорт.</a></div></th>
 				</tr>
 			{% for record in entities.object_list %}
 				<tr {% if forloop.counter|divisibleby:"2" %} class="even" {% endif %}>
@@ -25,11 +25,11 @@
 	{% endif %}
 </div>
 
-{% ifnotequal entities.paginator.num_pages 1 %} 
+{% if entities.paginator.num_pages != 1 %} 
 	<div id="pagination">
 		{% for page_num in entities.paginator.page_range %}
-	        <a class="ajax{% ifequal page_num entities.number %} hover{% endifequal %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?page={{ page_num }}&sort={{ sort_by }}', 'exercise-records')">{{ page_num }}</a>
+	        <a class="ajax{% if page_num == entities.number %} hover{% endif %}" onclick="EWT.ajax.getInto('{{exercise.ajax_get_records}}?page={{ page_num }}&sort={{ sort_by }}', 'exercise-records')">{{ page_num }}</a>
 		{% endfor %}
 	</div>
-{% endifnotequal %}
+{% endif %}
 
