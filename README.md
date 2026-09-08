@@ -40,7 +40,13 @@ docker compose up -d --build
 
 Приложение будет доступно на **http://localhost:8000**.
 
-Логин и пароль по умолчанию: **`admin` / `admin`**.
+Приложение поднимется с безопасными значениями по умолчанию для разработки; логин и пароль — **`admin` / `admin`**. Чтобы задать свои секреты, скопируйте шаблон и заполните его:
+
+```bash
+cp .env.example .env    # Windows: copy .env.example .env
+```
+
+`docker compose` читает `.env` автоматически, и этот файл исключён из git.
 
 При старте контейнера `web` скрипт `djproject/docker_start.py` автоматически:
 
@@ -78,13 +84,16 @@ docker compose exec -w /app/djproject web python manage.py syncdb
 
 ## Переменные окружения
 
-Для Docker все значения заданы в `docker-compose.yml`. Файл `djproject/.env` **не читается автоматически** — `djproject/core/env.py` берёт значения только из окружения процесса.
+Секреты в репозитории не хранятся. `docker-compose.yml` содержит только подстановки вида `${SECRET_KEY:-...}` с заведомо небезопасными значениями по умолчанию для локальной разработки, а реальные значения берутся из `.env` (он в `.gitignore`) или из переменных окружения хоста.
+
+Приложение читает настройки **только из окружения процесса** (`djproject/core/env.py` использует `os.environ`) — файлов `.env` внутри контейнера оно не ищет. Их подставляет `docker compose` на хосте.
 
 | Переменная | Обязательна | Назначение |
 |---|---|---|
 | `DB_NAME`, `DB_USER`, `DB_PASSWORD` | да | подключение к PostgreSQL |
 | `DB_HOST`, `DB_PORT` | нет | по умолчанию `localhost` и `5432` |
 | `SECRET_KEY` | да | ключ Django |
+| `ALLOWED_HOSTS` | при `DEBUG=False` | домены через запятую; Django проверяет заголовок `Host` |
 | `ADMIN_EMAIL` | да | адрес администратора |
 | `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `SERVER_EMAIL` | да | параметры SMTP |
 | `DEBUG` | нет | `True` включает режим отладки |
@@ -93,8 +102,39 @@ docker compose exec -w /app/djproject web python manage.py syncdb
 | `USE_TEMPLATE_CACHE` | нет | `1` включает кеширующий загрузчик шаблонов |
 | `DJANGO_ADMIN_USER`, `DJANGO_ADMIN_PASSWORD` | нет | логин и пароль создаваемого суперпользователя |
 | `MEDIA_ROOT` | нет | путь к статике, по умолчанию `htdocs/media` |
+| `HTTP_PORT` | нет | порт nginx на хосте, по умолчанию 8000 |
 
-Перед публикацией в интернет обязательно замените `SECRET_KEY`, пароли БД и почты, а `DEBUG` выставьте в `False`.
+## Запуск в production
+
+Конфигурация разделена на три файла:
+
+| Файл | Роль |
+|---|---|
+| `docker-compose.yml` | база: сервисы и небезопасные значения по умолчанию для разработки |
+| `docker-compose.override.yml` | только разработка: публикует порт PostgreSQL на `127.0.0.1:5432`. Compose подхватывает его автоматически |
+| `docker-compose.prod.yml` | production: `DEBUG=False`, `restart: unless-stopped`, обязательные секреты |
+
+Запуск:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+Явное перечисление файлов через `-f` отключает автоматический `docker-compose.override.yml`, поэтому порт БД наружу не публикуется.
+
+В prod-файле секреты объявлены как `${SECRET_KEY:?...}`: если переменная не задана, compose откажется стартовать вместо запуска с небезопасным значением. Обязательны `DB_PASSWORD`, `SECRET_KEY`, `DJANGO_ADMIN_PASSWORD` и `ALLOWED_HOSTS`.
+
+Важные особенности:
+
+- **`POSTGRES_PASSWORD` применяется только при создании тома.** Смена `DB_PASSWORD` для уже существующего тома `postgres_data` пароль в БД не изменит — нужен либо новый том, либо `ALTER USER <имя> WITH PASSWORD '...';`
+- **`DJANGO_ADMIN_PASSWORD` действует только при первом создании суперпользователя.** Если пользователь уже есть, смените пароль вручную:
+  ```bash
+  docker compose exec -w /app/djproject web python manage.py changepassword admin
+  ```
+- **При `DEBUG=False` Django перестаёт отдавать `/media/`** (маршрут в `djproject/urls.py` объявлен внутри `if settings.DEBUG`), поэтому nginx перед приложением обязателен.
+- **Смена `SECRET_KEY` инвалидирует сессии** — все пользователи будут разлогинены.
+- Почта по умолчанию уходит в консольный backend. Для реальной отправки задайте `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend` и рабочий SMTP: у Django 1.4 нет таймаута на отправку, поэтому недоступный сервер способен занять воркер.
+- Python 2.7, Django 1.4 и PostgreSQL 9.6 сняты с поддержки и не получают обновлений безопасности. Не выставляйте приложение в открытый интернет без внешнего ограничения доступа.
 
 ## Структура проекта
 

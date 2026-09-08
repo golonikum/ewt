@@ -1,0 +1,22 @@
+# Production-оверрайд. Запуск:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Секреты берутся только из окружения (файл .env или переменные хоста).
+# Синтаксис ${VAR:?...} останавливает запуск, если переменная не задана.
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    restart: unless-stopped
+
+  web:
+    environment:
+      - DEBUG=False
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:?ALLOWED_HOSTS is required, e.g. words.example.com}
+      - DB_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is required}
+      - SECRET_KEY=${SECRET_KEY:?SECRET_KEY is required}
+      - DJANGO_ADMIN_PASSWORD=${DJANGO_ADMIN_PASSWORD:?DJANGO_ADMIN_PASSWORD is required}
+    restart: unless-stopped
+
+  nginx:
+    restart: unless-stopped

@@ -10,6 +10,8 @@
 	$(document).ready(function(){
 		new AjaxUpload($('#upload_button', EWT.utils.getActiveTab()), {
 			action: $('#upload_button', EWT.utils.getActiveTab()).attr('href'),
+			// AjaxUpload posts its own iframe form, so the token has to travel as a field
+			data: {csrfmiddlewaretoken: EWT.ajax._csrfToken()},
 			onSubmit: function(file, extension) {
 				EWT.utils.showLoadingAnimation(true);
 			},

@@ -2,13 +2,11 @@ services:
   db:
     image: postgres:9.6
     environment:
-      POSTGRES_DB: etrainer_golonru
-      POSTGRES_USER: etrainer_golonru
-      POSTGRES_PASSWORD: your_secure_password_here
+      POSTGRES_DB: ${DB_NAME:-etrainer_golonru}
+      POSTGRES_USER: ${DB_USER:-etrainer_golonru}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-dev-insecure-password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
   web:
     build: .
@@ -18,29 +16,33 @@ services:
     depends_on:
       - db
     environment:
-      - DEBUG=True
-      - USE_TEMPLATE_CACHE=1
-      - GUNICORN_WORKERS=3
-      - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
-      - DB_NAME=etrainer_golonru
-      - DB_USER=etrainer_golonru
-      - DB_PASSWORD=your_secure_password_here
+      - DEBUG=${DEBUG:-True}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - USE_TEMPLATE_CACHE=${USE_TEMPLATE_CACHE:-1}
+      - GUNICORN_WORKERS=${GUNICORN_WORKERS:-3}
+      - GUNICORN_TIMEOUT=${GUNICORN_TIMEOUT:-300}
+      - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
+      - DB_NAME=${DB_NAME:-etrainer_golonru}
+      - DB_USER=${DB_USER:-etrainer_golonru}
+      - DB_PASSWORD=${DB_PASSWORD:-dev-insecure-password}
       - DB_HOST=db
       - DB_PORT=5432
-      - SECRET_KEY=your_secret_key_here
-      - ADMIN_EMAIL=admin@golonikum.net
-      - EMAIL_HOST=smtp.hostfabrica.ru
-      - EMAIL_PORT=25
-      - EMAIL_HOST_USER=admin@golonikum.net
-      - EMAIL_HOST_PASSWORD=your_secure_email_password_here
-      - SERVER_EMAIL=smtp.hostfabrica.ru
+      - SECRET_KEY=${SECRET_KEY:-dev-insecure-secret-key}
+      - DJANGO_ADMIN_USER=${DJANGO_ADMIN_USER:-admin}
+      - DJANGO_ADMIN_PASSWORD=${DJANGO_ADMIN_PASSWORD:-admin}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - EMAIL_HOST=${EMAIL_HOST:-localhost}
+      - EMAIL_PORT=${EMAIL_PORT:-25}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER:-}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD:-}
+      - SERVER_EMAIL=${SERVER_EMAIL:-admin@example.com}
 
   nginx:
     build:
       context: .
       dockerfile: docker/nginx.Dockerfile
     ports:
-      - "8000:80"
+      - "${HTTP_PORT:-8000}:80"
     depends_on:
       - web
 

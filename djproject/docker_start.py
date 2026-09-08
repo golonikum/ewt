@@ -45,11 +45,13 @@ def main():
         print("loaddata skipped: %s" % exc)
     ensure_admin()
     workers = os.environ.get("GUNICORN_WORKERS", "3")
+    # CSV import of a few thousand words runs well past the 30s default
+    timeout = os.environ.get("GUNICORN_TIMEOUT", "300")
     os.execvp("gunicorn", [
         "gunicorn",
         "--bind", "0.0.0.0:8000",
         "--workers", workers,
-        "--timeout", "30",
+        "--timeout", timeout,
         "--access-logfile", "-",
         "--error-logfile", "-",
         "wsgi:application",

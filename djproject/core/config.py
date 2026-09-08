@@ -4,6 +4,7 @@ from django.template import Context
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.utils.encoding import force_unicode
+from django.db import transaction
 import csv, re
 from datetime import datetime
 from core.models import Word, SpeechPart, Group, Sentence, Config
@@ -42,6 +43,7 @@ def export(request, what):
 
 @exception_wrapper(ajax_upload_error)
 @auth_required
+@transaction.commit_on_success
 def csv_import(request):
     if request.method == 'POST':
         file = request.FILES['userfile']
@@ -122,7 +124,10 @@ def read_csv_file(file):
     csv_data = str()
     for chunk in file.chunks():
         csv_data += chunk
-    return csv_data.split('\r\n')
+    # Uploads arrive with CRLF, LF or CR endings, and Excel may prepend a BOM
+    if csv_data.startswith('\xef\xbb\xbf'):
+        csv_data = csv_data[3:]
+    return csv_data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
 
 def get_words_from_csv(csv_data, user):
     '''
@@ -133,6 +138,7 @@ def get_words_from_csv(csv_data, user):
     reader = csv.reader(csv_data, delimiter=';')
     words = list()
     now = datetime.now()
+    speech_parts = dict()
     try:
         for i, row in enumerate(reader):
             if i == 0:
@@ -145,7 +151,7 @@ def get_words_from_csv(csv_data, user):
                     # checking data: signature and translation can't be empty
                     if not (row[0] and row[1]):
                         raise ValueError('Неправильный формат данных: отсутствует слово и/или перевод.', 'Строка %d.' % i.__add__(1))
-                    words.append(get_word(row, user))
+                    words.append(get_word(row, user, speech_parts))
                 # checking data: number of words
                 elif len(row) != 0:
                     raise ValueError('Неправильный формат данных: число столбцов должно быть равно 7.', 'Строка %d.' % i.__add__(1))
@@ -157,7 +163,25 @@ def get_words_from_csv(csv_data, user):
         raise e   
     return process_words(words)
                 
-def get_word(row, user):
+def get_speech_part(name, cache=None):
+    '''
+    Speech parts are a small fixed table, so each distinct name is resolved
+    once per import instead of once per CSV row.
+    '''
+    if cache is not None and name in cache:
+        return cache[name]
+    # silent checking speech part:
+    # try to find similar speech part,
+    # if no - get first
+    try:
+        sp = SpeechPart.objects.filter(name__contains=name)[0]
+    except IndexError:
+        sp = SpeechPart.objects.all()[0]
+    if cache is not None:
+        cache[name] = sp
+    return sp
+
+def get_word(row, user, speech_parts=None):
     '''
     Each row contains following data:
     row[0] - signature; row[1] - translation;
@@ -167,13 +191,7 @@ def get_word(row, user):
     Function returns new Word object with temp dictionary attribute 
     which contains synonyms, sentences and groups strings. 
     '''
-    # silent checking speech part:
-    # try to find similar speech part,
-    # if no - get first
-    try:
-        sp = SpeechPart.objects.filter(name__contains=row[2])[0]
-    except Exception, e:
-        sp = SpeechPart.objects.all()[0] 
+    sp = get_speech_part(row[2], speech_parts)
     # create word object
     words = Word.objects.filter(user=user, signature=row[0], speech_part=sp, translation=force_unicode(row[1]))
     if len(words) == 0:

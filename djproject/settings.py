@@ -3,6 +3,9 @@ from core.env import DEBUG, SECRET_KEY, ADMIN_EMAIL, EMAIL_HOST, EMAIL_PORT, EMA
 
 TEMPLATE_DEBUG = DEBUG
 
+# Django validates the Host header against this list whenever DEBUG is False
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '*').split(',') if h.strip()]
+
 ADMINS = (
     ('admin', ADMIN_EMAIL),
 )
