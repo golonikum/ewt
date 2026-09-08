@@ -1,5 +1,4 @@
 Django==1.4.22
 gunicorn==19.7.1
-psycopg2==2.8.6
-python-decouple==3.6
-Pillow==2.7.0
+# Binary wheel: avoids needing gcc/libpq-dev on an EOL Debian base image
+psycopg2-binary==2.8.6

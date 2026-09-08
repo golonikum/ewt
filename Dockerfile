@@ -4,18 +4,17 @@ FROM python:2.7-slim
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Debian buster вышел из поддержки — переключаемся на архивные репозитории
-RUN sed -i 's|deb.debian.org/debian |archive.debian.org/debian |g; s|security.debian.org/debian-security|archive.debian.org/debian-security|g' /etc/apt/sources.list \
-    && sed -i '/buster-updates/d' /etc/apt/sources.list \
-    && echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
-
-# Устанавливаем зависимости для psycopg2
-RUN apt-get update && apt-get install -y     libpq-dev     gcc     python-dev     && rm -rf /var/lib/apt/lists/*
-
 # Копируем файлы зависимостей
 COPY requirements.txt .
 
-# Устанавливаем зависимости
+# Устанавливаем зависимости.
+# Все пакеты ставятся из готовых wheel, поэтому компилятор и apt не нужны:
+# базовый образ основан на Debian buster, чьи репозитории уехали в архив
+# и при сборке на чужой машине периодически недоступны.
+#
+# Django 1.4 старше формата wheel, и его setup.py при попытке сборки печатает
+# "Django 1.4 does not support wheel. This error is safe to ignore." —
+# pip действительно игнорирует это и ставит пакет через setup.py install.
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем код приложения
